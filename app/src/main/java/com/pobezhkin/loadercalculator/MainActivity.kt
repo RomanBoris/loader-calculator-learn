@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.pobezhkin.loadercalculator.presentation.screens.ScreenAddCar
 import com.pobezhkin.loadercalculator.ui.theme.LoaderCalculatorTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,9 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LoaderCalculatorTheme {
-              /*  Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                }*/
+                ScreenAddCar()
             }
         }
     }
