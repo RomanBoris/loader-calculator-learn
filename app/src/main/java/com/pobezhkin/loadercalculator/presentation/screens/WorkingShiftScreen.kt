@@ -65,7 +65,7 @@ fun ScreenAddCar(){
              Box(
                 modifier = Modifier.weight(2f, true)
              ){
-
+                
              }
           Row(
               modifier = Modifier.weight(0.3f)
