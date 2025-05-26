@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -42,10 +43,13 @@ android {
 
 dependencies {
 
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    kapt("com.google.dagger:hilt-android-compiler:2.56.2")
+
     val room_version = "2.7.1"
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
-
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")  // Для Flow
     implementation( "androidx.room:room-ktx:$room_version")  // Для Room + Flow
 

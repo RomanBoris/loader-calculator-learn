@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class LoaderRepositoryImpl(
     private val truckDao: LoadedTruckDao
 ): LoaderRepository {
+
     override suspend fun addTrucks(truck : LoadedTruck) {
         truckDao.insert(truck)
     }
