@@ -9,9 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -22,9 +26,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pobezhkin.loadercalculator.data.workshift.LoadedTruck
 
 @Composable
-fun TruckItem(){
+fun TruckItem(
+    loadedTruck : LoadedTruck,
+    deleteElement: () -> Unit
+){
 
  Card (
         modifier = Modifier.fillMaxWidth()
@@ -38,14 +46,18 @@ fun TruckItem(){
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "ЕО",
+                text = loadedTruck.processingUnit.toString(),
                 fontSize = 24.sp,
             )
 
             Text(
-                "Заморозка",
+                text = loadedTruck.processingUnitFreeze.toString(),
                 fontSize = 24.sp
             )
+
+            IconButton(onClick = deleteElement) {  // Кнопка удаления
+                Icon(Icons.Default.Delete, contentDescription = "Удалить")
+            }
         }
     }
 }
@@ -53,8 +65,8 @@ fun TruckItem(){
 
 
 
-@Preview
+/*@Preview
 @Composable
 fun PreviewTruckItem(){
     TruckItem()
-}
+}*/

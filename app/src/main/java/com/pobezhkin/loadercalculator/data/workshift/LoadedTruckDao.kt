@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LoadedTruckDao {
-    @Query("SELECT * FROM loaded_trucks")
 
+    @Query("SELECT * FROM loaded_trucks")
     fun getAllTrucks(): Flow<List<LoadedTruck>>
+
     @Insert
     suspend fun insert(truck : LoadedTruck)
 

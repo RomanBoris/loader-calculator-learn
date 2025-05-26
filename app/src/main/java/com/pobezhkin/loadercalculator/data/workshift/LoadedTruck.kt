@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "loaded_trucks")
 data  class LoadedTruck(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey(autoGenerate = true)val id: Int = 0,
+
     @ColumnInfo(name = "total_eo")
     val processingUnit : Int,
     @ColumnInfo(name = "freeze_eo")
