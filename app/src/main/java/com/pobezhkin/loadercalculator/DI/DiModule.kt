@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.LoaderDataBase
-import com.pobezhkin.loadercalculator.data.workshift.repository.LoaderRepository
+import com.pobezhkin.loadercalculator.data.workshift.repository.LoaderRepositoryImpl
+import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,7 +38,7 @@ object DiModule {
     @Provides
     @Singleton
     fun provideItemRepository(loadedTruckDao : LoadedTruckDao ): LoaderRepository {
-        return LoaderRepository(loadedTruckDao)
+        return LoaderRepositoryImpl(loadedTruckDao)
     }
 
 

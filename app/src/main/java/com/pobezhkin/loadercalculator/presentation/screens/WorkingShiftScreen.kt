@@ -29,13 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pobezhkin.loadercalculator.R
+import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenAddCar(
     viewModel : WorkingShiftScreenViewModel = hiltViewModel()
 ) {
-    val langs = listOf("Kotlin", "Java", "JavaScript", "Python", "C#", "C++", "Rust")
+
 
     val trucks by viewModel.trucks.collectAsState(initial = emptyList())
 
@@ -85,7 +86,7 @@ fun ScreenAddCar(
                         modifier = Modifier.padding(vertical = 4.dp)
                     )*/
                     TruckItem(
-                        loadedTruck = loaderTruck,
+                        loadedTruckModel = loaderTruck,
                         deleteElement = { viewModel.deleteTrucks(loaderTruck) }
                     )
 

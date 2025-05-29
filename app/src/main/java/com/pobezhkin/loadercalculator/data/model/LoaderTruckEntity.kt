@@ -1,15 +1,14 @@
-package com.pobezhkin.loadercalculator.data.workshift
+package com.pobezhkin.loadercalculator.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "loaded_trucks")
-data  class LoadedTruck(
-    @PrimaryKey(autoGenerate = true)val id: Int = 0,
-
+data  class LoaderTruckEntity(
+    @PrimaryKey(autoGenerate = true) val id : Int = 0,
     @ColumnInfo(name = "total_eo")
-    val processingUnit : Int,
+    val h_unit : Int,
     @ColumnInfo(name = "freeze_eo")
-    val processingUnitFreeze : Int
+    val fz_h_unit : Int
   )

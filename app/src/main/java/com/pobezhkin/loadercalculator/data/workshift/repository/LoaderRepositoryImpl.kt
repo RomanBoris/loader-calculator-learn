@@ -1,0 +1,35 @@
+package com.pobezhkin.loadercalculator.data.workshift.repository
+
+import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
+import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
+import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
+import com.pobezhkin.loadercalculator.domain.model.toLoaderTruckEntity
+import com.pobezhkin.loadercalculator.domain.model.toLoaderTruckModel
+import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+
+class LoaderRepositoryImpl @Inject constructor(
+    private val loadedTruckDao : LoadedTruckDao
+) : LoaderRepository {
+
+
+    override fun getAllTrucks() : Flow<List<LoaderTruckModel>> {
+       return loadedTruckDao.getAllTrucks()
+           .map {entities ->
+           entities.map {
+               it.toLoaderTruckModel()
+           }
+       }
+    }
+
+    override suspend fun addTrucks(eo: Int, fz: Int) {
+        loadedTruckDao.insert(LoaderTruckEntity( h_unit = eo, fz_h_unit = fz ))
+    }
+
+    override suspend fun deleteTrucks(truck : LoaderTruckModel) {
+        loadedTruckDao.delete(truck.toLoaderTruckEntity())
+    }
+
+}
