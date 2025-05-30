@@ -5,20 +5,31 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pobezhkin.loadercalculator.R
 import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenViewModel
@@ -37,8 +49,9 @@ fun ScreenAddCar(
     viewModel : WorkingShiftScreenViewModel = hiltViewModel()
 ) {
 
-
-    val trucks by viewModel.trucks.collectAsState(initial = emptyList())
+    val openDialog = remember{ mutableStateOf(false) }
+    val lazyColumnState = rememberLazyListState()
+        val trucks by viewModel.trucks.collectAsState(initial = emptyList())
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -73,6 +86,7 @@ fun ScreenAddCar(
             )
 
             LazyColumn(
+                state = lazyColumnState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
@@ -93,6 +107,38 @@ fun ScreenAddCar(
                 }
             }
 
+            if (openDialog.value) {
+                BasicAlertDialog(
+                    onDismissRequest = {
+                        // Dismiss the dialog when the user clicks outside the dialog or on the back
+                        // button. If you want to disable that functionality, simply use an empty
+                        // onDismissRequest.
+                        openDialog.value = false
+                    }
+                ) {
+                    Surface(
+                        modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                        shape = MaterialTheme.shapes.large,
+                        tonalElevation = AlertDialogDefaults.TonalElevation
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text =
+                                "This area typically contains the supportive text " +
+                                        "which presents the details regarding the Dialog's purpose.",
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            TextButton(
+                                onClick = { openDialog.value = false },
+                                modifier = Modifier.align(Alignment.End)
+                            ) {
+                                Text("Confirm")
+                            }
+                        }
+                    }
+                }
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,7 +146,7 @@ fun ScreenAddCar(
             ) {
                 OutlinedButton(
                     modifier = Modifier.weight(1f),
-                    onClick = { viewModel.addTrucks(trucks.size + 1, trucks.size + 1  )},
+                    onClick = { openDialog.value = true  },
                 ) {
                     Text(text = stringResource(R.string.uploading))
                 }
@@ -127,8 +173,4 @@ fun ScreenAddCar(
     }
 }
 
-@Preview
-@Composable
-fun PreviewScreenAddCar() {
-    ScreenAddCar()
-}
+/*onClick = { viewModel.addTrucks(trucks.size + 1, trucks.size + 1  )},*/

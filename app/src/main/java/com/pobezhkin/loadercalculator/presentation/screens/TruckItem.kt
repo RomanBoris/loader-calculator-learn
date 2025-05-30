@@ -38,12 +38,12 @@ fun TruckItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = loadedTruckModel.h_unit.toString(),
+                text = ("ЕО: ${loadedTruckModel.h_unit.toString()}"),
                 fontSize = 24.sp,
             )
 
             Text(
-                text = loadedTruckModel.fz_h_unit.toString(),
+                text = ("Мороз: ${loadedTruckModel.fz_h_unit.toString()}") ,
                 fontSize = 24.sp
             )
 

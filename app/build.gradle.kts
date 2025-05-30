@@ -53,6 +53,9 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")  // Для Flow
     implementation( "androidx.room:room-ktx:$room_version")  // Для Room + Flow
 
+    implementation ("androidx.compose.material3:material3:1.2.1")
+
+    
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -14,7 +14,6 @@ class LoaderRepositoryImpl @Inject constructor(
     private val loadedTruckDao : LoadedTruckDao
 ) : LoaderRepository {
 
-
     override fun getAllTrucks() : Flow<List<LoaderTruckModel>> {
        return loadedTruckDao.getAllTrucks()
            .map {entities ->
