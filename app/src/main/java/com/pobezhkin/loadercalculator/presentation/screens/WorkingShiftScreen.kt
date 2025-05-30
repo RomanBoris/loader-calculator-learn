@@ -1,5 +1,6 @@
 package com.pobezhkin.loadercalculator.presentation.screens
 
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
@@ -24,15 +26,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,9 +56,15 @@ import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenV
 fun ScreenAddCar(
     viewModel : WorkingShiftScreenViewModel = hiltViewModel()
 ) {
+    val eoState = remember { mutableStateOf("") }
+    val errorText = remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
     val openDialog = remember{ mutableStateOf(false) }
     val lazyColumnState = rememberLazyListState()
+
+
+
         val trucks by viewModel.trucks.collectAsState(initial = emptyList())
 
     Scaffold(
@@ -94,11 +108,7 @@ fun ScreenAddCar(
             ) {
 
                 items(trucks) { loaderTruck  ->
-                   /* Text(
-                        lang,
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )*/
+
                     TruckItem(
                         loadedTruckModel = loaderTruck,
                         deleteElement = { viewModel.deleteTrucks(loaderTruck) }
@@ -110,9 +120,6 @@ fun ScreenAddCar(
             if (openDialog.value) {
                 BasicAlertDialog(
                     onDismissRequest = {
-                        // Dismiss the dialog when the user clicks outside the dialog or on the back
-                        // button. If you want to disable that functionality, simply use an empty
-                        // onDismissRequest.
                         openDialog.value = false
                     }
                 ) {
@@ -121,23 +128,103 @@ fun ScreenAddCar(
                         shape = MaterialTheme.shapes.large,
                         tonalElevation = AlertDialogDefaults.TonalElevation
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(
+
+                            modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text =
-                                "This area typically contains the supportive text " +
-                                        "which presents the details regarding the Dialog's purpose.",
+                                modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
+                                textAlign = TextAlign.Center,
+                                text ="Введите количество \n" +
+                                        " принятых из под стола ЕО:"
+                                ,
                             )
-                            Spacer(modifier = Modifier.height(24.dp))
-                            TextButton(
-                                onClick = { openDialog.value = false },
-                                modifier = Modifier.align(Alignment.End)
-                            ) {
-                                Text("Confirm")
+
+                            //проверяем
+                            LaunchedEffect(Unit) {
+                                focusRequester.requestFocus()
                             }
+
+                            TextField(
+                                modifier = Modifier.focusRequester(focusRequester),
+                                value = eoState.value,
+                              onValueChange = {newText ->
+                                  when {
+                                      newText.isEmpty() ->{
+                                          eoState.value = ""
+                                          errorText.value = true
+                                      }
+                                      newText.all { it.isDigit() } ->{
+                                          eoState.value = newText
+                                          errorText.value = false
+                                      }
+
+                                  }
+                              },
+
+                                keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number
+                                ),
+
+                                label = { Text("ЕО:") },
+
+                                singleLine = true,
+
+                                isError = errorText.value,
+
+                                supportingText = {
+                                    if (errorText.value){
+                                        Text(
+                                            text = "Обязятельно ввести",
+                                            color = Color.Red
+                                        )
+                                    }
+                                },
+
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Row(modifier = Modifier.padding(16.dp)) {
+
+
+                                TextButton(
+                                    onClick = {
+                                        if (eoState.value.isNotEmpty() && !errorText.value) {
+                                            // Действия при успешном сохранении
+                                            //viewModel.saveEoValue(eoState.value.toInt())
+                                            openDialog.value = false
+                                        } else {
+                                            // Показываем ошибку, если поле пустое
+                                            errorText.value = true
+                                        }
+                                    }
+                                ) {
+                                    Text("Сохранить")
+                                }
+
+                                /*
+                                TextButton(
+                                    onClick = { openDialog.value = false },
+                                    // modifier = Modifier.align(Alignment.End)
+                                ) {
+                                    Text("Сохранить")
+                                }*/
+
+
+                                TextButton(
+                                    onClick = { openDialog.value = false },
+                                    //  modifier = Modifier.align(Alignment.End)
+                                ) {
+                                    Text("Отмена")
+                                }
+                            }
+
                         }
+
+
+
                     }
                 }
             }
+
 
             Row(
                 modifier = Modifier
@@ -174,3 +261,4 @@ fun ScreenAddCar(
 }
 
 /*onClick = { viewModel.addTrucks(trucks.size + 1, trucks.size + 1  )},*/
+
