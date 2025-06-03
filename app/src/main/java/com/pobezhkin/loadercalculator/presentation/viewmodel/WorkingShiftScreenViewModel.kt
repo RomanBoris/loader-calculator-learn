@@ -9,6 +9,7 @@ import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.usecase.AddTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetTrucksUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.UpdateTruckUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +22,7 @@ class WorkingShiftScreenViewModel @Inject constructor(
     private val getTrucksUseCase : GetTrucksUseCase,
     private val deleteTrucksUseCase : DeleteTrucksUseCase  ,
     private val addTrucksUseCase : AddTrucksUseCase,
+    private val updateTruckUseCase: UpdateTruckUseCase
 ) : ViewModel() {
 
       /*  private val _trucks = MutableStateFlow<List<LoaderTruckEntity>>(emptyList())
@@ -49,5 +51,11 @@ class WorkingShiftScreenViewModel @Inject constructor(
                deleteTrucksUseCase(loadedTruckModel)
             }
         }
+
+    fun updateTrucks(loadedTruckModel: LoaderTruckModel){
+        viewModelScope.launch {
+            updateTruckUseCase(loadedTruckModel)
+        }
+    }
 
 }

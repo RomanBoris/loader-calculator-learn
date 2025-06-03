@@ -31,4 +31,8 @@ class LoaderRepositoryImpl @Inject constructor(
         loadedTruckDao.delete(truck.toLoaderTruckEntity())
     }
 
+    override suspend fun updateTrucks(truck: LoaderTruckModel) {
+        loadedTruckDao.update(truck.toLoaderTruckEntity())
+    }
+
 }

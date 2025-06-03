@@ -12,4 +12,6 @@ interface LoaderRepository {
 
     suspend fun deleteTrucks(truck : LoaderTruckModel)
 
+    suspend fun updateTrucks(truck : LoaderTruckModel)
+
 }
