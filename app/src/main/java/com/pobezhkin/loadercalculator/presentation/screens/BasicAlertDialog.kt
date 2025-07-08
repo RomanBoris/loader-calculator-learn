@@ -39,25 +39,36 @@ fun WorkAlertDialog(
 
     workType: WorkType,
     openDialog: Boolean,
-    onDismiss : () -> Unit,
-   onConfirm: (h_eo : Int, fz_h_eo: Int ) -> Unit
+    initialEo: Int = 0,
+    initialFz: Int = 0,
+    onDismiss: () -> Unit,
+    onConfirm: (h_eo: Int, fz_h_eo: Int) -> Unit
 
-){
+) {
 
-    val  eoWork = remember { mutableStateOf("") }
+    val eoWork = remember { mutableStateOf("") }
     val eoWorkFZ = remember { mutableStateOf("") }
 
     val errorText = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-   // val openDialog = remember{ mutableStateOf(false) }
+    // val openDialog = remember{ mutableStateOf(false) }
 
+    if (openDialog) {
+        LaunchedEffect(Unit) {
+            eoWork.value = initialEo.toString()
+            eoWorkFZ.value = initialFz.toString()
+            focusRequester.requestFocus()
+        }
+    }
 
-    if (openDialog ) {
+    if (openDialog) {
         BasicAlertDialog(
             onDismissRequest = onDismiss
         ) {
             Surface(
-                modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
                 shape = MaterialTheme.shapes.large,
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
@@ -67,18 +78,23 @@ fun WorkAlertDialog(
                     Text(
                         modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
                         textAlign = TextAlign.Center,
-                        text = when (workType) {
-                            WorkType.LOADING -> "Погрузкка"
-                            WorkType.UPLOADING -> "Введите количество \n" +
-                                    " принятых из под стола ЕО:"
-                        },
+                        text = if(initialEo == 0) {
+                            when (workType) {
+                                WorkType.LOADING -> "Погрузкка"
+                                WorkType.UPLOADING -> "Введите количество \n" +
+                                        " принятых из под стола ЕО:"
+                            }
+
+                        } else "Редактирование Машины"
+
+                        ,
                         style = MaterialTheme.typography.titleMedium
                     )
 
-                    //проверяем
+                  /*  //проверяем
                     LaunchedEffect(Unit) {
                         focusRequester.requestFocus()
-                    }
+                    } */
 
                     TextField(
                         modifier = Modifier
@@ -95,13 +111,9 @@ fun WorkAlertDialog(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number
                         ),
-
                         label = { Text("ЕО:") },
-
                         singleLine = true,
-
                         isError = errorText.value,
-
                         supportingText = {
                             if (errorText.value) {
                                 Text(
@@ -136,23 +148,20 @@ fun WorkAlertDialog(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     TextButton(onClick = {
-
                         if (eoWork.value.isNotEmpty()) {
                             onConfirm(
                                 eoWork.value.toInt(),
                                 eoWork.value.toInt()
                             )
                             onDismiss()
+                        } else {
+                            errorText.value = true
+
                         }
-
-                        else {
-                        errorText.value = true
-
-                    }
                     }
                     ) {
-                    Text("Сохранить")
-                }
+                        Text("Сохранить")
+                    }
 
 
                     TextButton(onClick = onDismiss) {

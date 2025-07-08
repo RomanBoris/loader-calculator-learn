@@ -1,5 +1,8 @@
 package com.pobezhkin.loadercalculator.presentation.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -20,16 +23,22 @@ import androidx.compose.ui.unit.sp
 import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TruckItem(
     loadedTruckModel : LoaderTruckModel ,
-    deleteElement: () -> Unit
+    deleteElement: () -> Unit,
+    onLongClick: () -> Unit
 ){
 
  Card (
         modifier = Modifier.fillMaxWidth()
             .padding(20.dp)
             .height(40.dp)
+            .combinedClickable(
+                onClick = {},
+                onLongClick = onLongClick
+            )
   ) {
         Row(
             modifier = Modifier.fillMaxWidth()

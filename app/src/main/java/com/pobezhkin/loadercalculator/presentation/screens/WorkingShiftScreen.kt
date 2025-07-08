@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pobezhkin.loadercalculator.R
+import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.WorkType
 import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenViewModel
 
@@ -43,8 +44,9 @@ fun ScreenAddCar(
 ) {
 
     var openDialogUploading by remember { mutableStateOf(false) }
+    var openEditDialog by remember { mutableStateOf(false) }// Для редактирования
+    var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }// Выбранный грузо
     var workType by remember { mutableStateOf(WorkType.UPLOADING) }
-
     val lazyColumnState = rememberLazyListState()
     val trucks by viewModel.trucks.collectAsState(initial = emptyList())
 
@@ -92,7 +94,11 @@ fun ScreenAddCar(
 
                     TruckItem(
                         loadedTruckModel = loaderTruck,
-                        deleteElement = { viewModel.deleteTrucks(loaderTruck) }
+                        deleteElement = { viewModel.deleteTrucks(loaderTruck) },
+                        onLongClick = {
+                            selectedTruck = loaderTruck
+                            openEditDialog = true
+                        }
                     )
 
                 }
@@ -110,6 +116,30 @@ fun ScreenAddCar(
                     openDialogUploading = false
                 }
             )
+
+            selectedTruck?.let { truck ->
+                WorkAlertDialog(
+                    workType = WorkType.LOADING,
+                    openDialog = openEditDialog,
+                    initialEo = truck.h_unit,
+                    initialFz = truck.fz_h_unit,
+                    onDismiss = {
+                        openEditDialog = false
+                        selectedTruck = null
+                    },
+                    onConfirm = { amount , freeze ->
+
+                        val eoValue = amount
+                        val freezeValue = freeze
+
+                        viewModel.updateTrucks(truck.copy(h_unit = eoValue, fz_h_unit = freezeValue))
+                        openEditDialog = false
+                        selectedTruck = null
+                    }
+                )
+
+
+            }
 
             Row(
                 modifier = Modifier
