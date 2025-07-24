@@ -1,6 +1,7 @@
 package com.pobezhkin.loadercalculator.presentation.screens
 
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -106,20 +107,20 @@ fun ScreenAddCar(
 
             // ВЫЗВАТЬ АЛЕРДИАЛОГ
             WorkAlertDialog(
-                workType = workType,
-                openDialog = openDialogUploading,
-                onDismiss = { openDialogUploading = false },
+
+                openDialog = openEditDialog,
+                onDismiss = { openEditDialog = false },
                 onConfirm = { amount, freeze ->
                     Log.d("onConfirm"," EO - $amount, FZ - $freeze")
                     // Передаем данные во ViewModel
                     viewModel.addTrucks(eo = amount, fz =  freeze)
-                    openDialogUploading = false
+                    openEditDialog = false
                 }
             )
 
             selectedTruck?.let { truck ->
                 WorkAlertDialog(
-                    workType = WorkType.LOADING,
+
                     openDialog = openEditDialog,
                     initialEo = truck.h_unit,
                     initialFz = truck.fz_h_unit,
@@ -140,6 +141,18 @@ fun ScreenAddCar(
 
 
             }
+
+            UploadingTrack(
+                openDialog = openDialogUploading,
+                onDismiss = {openDialogUploading = false},
+                onConfirm = { uploadEo ->
+
+                    viewModel.addTrucks(eo = uploadEo, fz = 0 )
+
+                }
+            )
+
+
 
             Row(
                 modifier = Modifier

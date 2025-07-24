@@ -1,5 +1,6 @@
 package com.pobezhkin.loadercalculator.presentation.screens
 
+import android.widget.PopupMenu.OnDismissListener
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,42 +29,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.pobezhkin.loadercalculator.domain.model.WorkType
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkAlertDialog(
+fun UploadingTrack(
+
     openDialog: Boolean,
     initialEo: Int = 0,
-    initialFz: Int = 0,
     onDismiss: () -> Unit,
-    onConfirm: (eo: Int, fz: Int) -> Unit // Переименовал параметры для ясности
-) {
-    val eoValue = remember { mutableStateOf("") }
-    val fzValue = remember { mutableStateOf("") }
-    val isEoError = remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
+    onConfirm: (uploadEo: Int) -> Unit
 
-    // Инициализация полей при открытии
+){
+
+    val eoValue = remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    val isEoError = remember { mutableStateOf(false) }
+
     if (openDialog) {
-        LaunchedEffect(Unit) {
+        LaunchedEffect (Unit){
             eoValue.value = initialEo.toString()
-            fzValue.value = if (initialFz != 0) initialFz.toString() else ""
             focusRequester.requestFocus()
         }
     }
 
-    if (openDialog) {
+    if(openDialog){
         BasicAlertDialog(
             onDismissRequest = onDismiss
         ) {
             Surface(
                 modifier = Modifier
-                    .width(280.dp) // Фиксированная ширина для аккуратности
+                    .width(280.dp)
                     .wrapContentHeight(),
                 shape = MaterialTheme.shapes.large,
                 tonalElevation = AlertDialogDefaults.TonalElevation
@@ -99,19 +97,7 @@ fun WorkAlertDialog(
                             }
                         })
 
-                    Spacer(modifier = Modifier.height(8.dp))
 
-                    // Поле заморозки (необязательное)
-                    TextField(modifier = Modifier.fillMaxWidth(),
-                        value = fzValue.value,
-                        onValueChange = { text ->
-                            if (text.all { it.isDigit() }) {
-                                fzValue.value = text
-                            }
-                        },
-                        label = { Text("Заморозка (FZ)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        placeholder = { Text("0, если не требуется") })
 
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -129,7 +115,7 @@ fun WorkAlertDialog(
                             } else {
                                 onConfirm(
                                     eoValue.value.toInt(),
-                                    fzValue.value.toIntOrNull() ?: 0 // Автоподстановка 0 для FZ
+
                                 )
                                 onDismiss()
                             }
@@ -138,7 +124,14 @@ fun WorkAlertDialog(
                         }
                     }
                 }
+
+
+
             }
+
         }
     }
+
+
+
 }
