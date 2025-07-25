@@ -10,5 +10,6 @@ data  class LoaderTruckEntity(
     @ColumnInfo(name = "total_eo")
     val h_unit : Int,
     @ColumnInfo(name = "freeze_eo")
-    val fz_h_unit : Int
+    val fz_h_unit : Int,
+
   )

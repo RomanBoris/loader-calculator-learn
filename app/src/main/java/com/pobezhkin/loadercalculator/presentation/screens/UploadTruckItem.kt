@@ -51,10 +51,6 @@ fun UploadTruckItem(
                 fontSize = 24.sp,
             )
 
-            Text(
-                text = ("Мороз: ${loadedTruckModel.fz_h_unit.toString()}") ,
-                fontSize = 24.sp
-            )
 
             IconButton(onClick = deleteElement) {  // Кнопка удаления
                 Icon(Icons.Default.Delete, contentDescription = "Удалить")

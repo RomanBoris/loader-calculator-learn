@@ -6,8 +6,16 @@ data class LoaderTruckModel(
     val id: Int = 0,
     val h_unit: Int = 0,
     val fz_h_unit: Int = 0,
-     val workType: WorkType
 )
 
-fun LoaderTruckEntity.toLoaderTruckModel()  = LoaderTruckModel(id, h_unit, fz_h_unit)
-fun LoaderTruckModel.toLoaderTruckEntity() = LoaderTruckEntity(id, h_unit, fz_h_unit)
+fun LoaderTruckEntity.toLoaderTruckModel() = LoaderTruckModel(
+    id = id,
+    h_unit = h_unit,
+    fz_h_unit = fz_h_unit,
+)
+
+fun LoaderTruckModel.toLoaderTruckEntity() = LoaderTruckEntity(
+    id = id,
+    h_unit = h_unit,
+    fz_h_unit = fz_h_unit
+)
