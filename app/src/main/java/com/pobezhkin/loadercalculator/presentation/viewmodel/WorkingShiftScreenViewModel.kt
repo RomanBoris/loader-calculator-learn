@@ -2,8 +2,11 @@ package com.pobezhkin.loadercalculator.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
+import com.pobezhkin.loadercalculator.data.model.UploadTruckEntity
 
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
+import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.usecase.AddTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetTrucksUseCase
@@ -11,6 +14,9 @@ import com.pobezhkin.loadercalculator.domain.usecase.GetUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.AddUploadUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,21 +30,30 @@ class WorkingShiftScreenViewModel @Inject constructor(
     private val getUploadUseCase: GetUploadUseCase
 ) : ViewModel() {
 
-      /*  private val _trucks = MutableStateFlow<List<LoaderTruckEntity>>(emptyList())
-        val trucks : StateFlow<List<LoaderTruckEntity>> = _trucks.asStateFlow() */
+      private val _trucks = MutableStateFlow<List<LoaderTruckModel>>(emptyList())
+        val trucks : StateFlow<List<LoaderTruckModel>> = _trucks.asStateFlow()
 
-    val trucks = getTrucksUseCase()
-    val uploadTruck = getUploadUseCase
+    private val _uploads = MutableStateFlow<List<UploadTruckModel>>(emptyList())
+        val uploads : StateFlow<List<UploadTruckModel>> = _uploads.asStateFlow()
 
-
-      /* init {
+        init {
             // Подписываемся на поток данных из репозитория
             viewModelScope.launch {
-                loaderRepository.allgetAllTrucks.collect{ trucksList ->
+                getTrucksUseCase().collect { trucksList ->
                     _trucks.value = trucksList
                 }
             }
-        }*/
+
+            viewModelScope.launch {
+                getUploadUseCase().collect { uploadsList ->
+                    _uploads.value = uploadsList
+                }
+            }
+        }
+
+
+
+
 
         fun addTrucks(eo: Int, fz : Int ){
             viewModelScope.launch {

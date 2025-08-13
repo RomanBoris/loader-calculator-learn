@@ -44,7 +44,7 @@ fun ScreenAddCar(
     viewModel: WorkingShiftScreenViewModel = hiltViewModel()
 ) {
 
-    var openDialogUploading by remember { mutableStateOf(false) }
+    var openUploadingDialog by remember { mutableStateOf(false) }
     var openDialogLoading by remember { mutableStateOf(false) }
     var openEditDialog by remember { mutableStateOf(false) }// Для редактирования
     var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }// Выбранный грузо
@@ -52,7 +52,7 @@ fun ScreenAddCar(
     var workType by remember { mutableStateOf(WorkType.LOADING) }
     val lazyColumnState = rememberLazyListState()
     val trucks by viewModel.trucks.collectAsState(initial = emptyList())
-    val trucksUpLoad by viewModel.trucks.collectAsState(initial = emptyList())
+    val upLoad by viewModel.uploads.collectAsState(initial = emptyList())
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -108,20 +108,6 @@ fun ScreenAddCar(
                 }
 
 
-              /*  items(trucksUpLoad){ UPloaderTruck ->
-
-                    UploadTruckItem(
-                        loadedTruckModel = UPloaderTruck,
-                        deleteElement = { viewModel.deleteTrucks(UPloaderTruck) },
-                        onLongClick = {
-                            selectedTruckUPL = UPloaderTruck
-                            openEditDialog = true
-                        }
-                    )
-
-
-                }*/
-
             }
 
             // ВЫЗВАТЬ АЛЕРДИАЛОГ
@@ -160,39 +146,15 @@ fun ScreenAddCar(
 
             }
 
-          /*  selectedTruckUPL?.let { truck ->
-                UploadingTrack(
-                    openDialog = openDialogUploading,
-                    initialEo = truck.h_unit,
-
-                    onDismiss = {
-                        openDialogUploading = false
-                        selectedTruck = null
-                    },
-                    onConfirm = { amount ->
-
-                        val eoValue = amount
-
-
-                        viewModel.updateTrucks(truck.copy(h_unit = eoValue, fz_h_unit = 0))
-                        openDialogUploading = false
-                        selectedTruck = null
-                    }
-                )
-            }
-
-
-
-
             UploadingTrack(
-                openDialog = openDialogUploading,
-                onDismiss = {openDialogUploading = false},
+                openDialog = openUploadingDialog,
+                initialEo = 0,
+                onDismiss = { openUploadingDialog = false },
                 onConfirm = { uploadEo ->
-
-                    viewModel.addTrucks(eo = uploadEo, fz = 0 )
-
+                    viewModel.addUpload(uploadEo)
+                    openUploadingDialog = false
                 }
-            ) */
+            )
 
 
 
@@ -205,7 +167,7 @@ fun ScreenAddCar(
                     modifier = Modifier.weight(1f),
                     onClick = {
                         workType = WorkType.UPLOADING
-                        openDialogUploading = true
+                        openUploadingDialog = true
                     },
                 ) {
                     Text(text = stringResource(R.string.uploading))
