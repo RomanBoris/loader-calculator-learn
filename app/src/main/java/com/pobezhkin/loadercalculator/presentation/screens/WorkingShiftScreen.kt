@@ -1,7 +1,6 @@
 package com.pobezhkin.loadercalculator.presentation.screens
 
 import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pobezhkin.loadercalculator.R
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
+import com.pobezhkin.loadercalculator.domain.model.UnionTruckItem
+import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.model.WorkType
 import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenViewModel
 
@@ -44,15 +45,20 @@ fun ScreenAddCar(
     viewModel: WorkingShiftScreenViewModel = hiltViewModel()
 ) {
 
-    var openUploadingDialog by remember { mutableStateOf(false) }
+    var openAddUploadingDialog by remember { mutableStateOf(false) }
+    var openEditUploadingDialog by remember { mutableStateOf(false) }
     var openDialogLoading by remember { mutableStateOf(false) }
     var openEditDialog by remember { mutableStateOf(false) }// Для редактирования
     var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }// Выбранный грузо
-    var selectedTruckUPL by remember { mutableStateOf<LoaderTruckModel?>(null) }// Выбранный грузо
+    var selectedUploadTrack by remember { mutableStateOf<UploadTruckModel?>(null) }// Выбранный грузо
     var workType by remember { mutableStateOf(WorkType.LOADING) }
     val lazyColumnState = rememberLazyListState()
     val trucks by viewModel.trucks.collectAsState(initial = emptyList())
     val upLoad by viewModel.uploads.collectAsState(initial = emptyList())
+
+    val unionTruckList = remember(trucks, upLoad) {
+        trucks.map{ UnionTruckItem.LoadingTruck(it) } + upLoad.map { UnionTruckItem.UpLoadingTruck(it) }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -94,18 +100,35 @@ fun ScreenAddCar(
                     .padding(horizontal = 16.dp)
             ) {
 
-                items(trucks) { loaderTruck ->
+                items(unionTruckList) { LoadAndUpload ->
+                    when (LoadAndUpload) {
+                    is UnionTruckItem.LoadingTruck -> {
+                        TruckItem(
+                            loadedTruckModel = LoadAndUpload.truck,
+                            deleteElement = { viewModel.deleteTrucks(LoadAndUpload.truck) },
+                            onLongClick = {
+                                selectedTruck = LoadAndUpload.truck
+                                openEditDialog = true
+                            }
+                        )
+                    }
 
-                    TruckItem(
-                        loadedTruckModel = loaderTruck,
-                        deleteElement = { viewModel.deleteTrucks(loaderTruck) },
-                        onLongClick = {
-                            selectedTruck = loaderTruck
-                            openEditDialog = true
+                        is UnionTruckItem.UpLoadingTruck -> {
+                            UploadTruckItem(
+                                upLoaderTruckModel = LoadAndUpload.upload,
+                                deleteElement = { viewModel.deleteUploadsTruck(LoadAndUpload.upload) },
+
+                            onLongClick = {
+                                selectedUploadTrack = LoadAndUpload.upload
+                                openEditUploadingDialog = true
+                            }
+                            )
+
                         }
-                    )
+
 
                 }
+            }
 
 
             }
@@ -146,13 +169,29 @@ fun ScreenAddCar(
 
             }
 
+            selectedUploadTrack?.let{ upLoadTrack ->
+                UploadingTrack(
+                        openDialog = openEditUploadingDialog,
+                    initialEo = upLoadTrack.upload,
+                    onDismiss = { openEditUploadingDialog = false },
+                    onConfirm = { newUploadEo ->
+
+                       val downloadEo = newUploadEo
+
+                        viewModel.updateUploadTruck(upLoadTrack.copy(upload = downloadEo))
+
+                        openEditUploadingDialog = false
+                    }
+                )
+            }
+
             UploadingTrack(
-                openDialog = openUploadingDialog,
-                initialEo = 0,
-                onDismiss = { openUploadingDialog = false },
-                onConfirm = { uploadEo ->
-                    viewModel.addUpload(uploadEo)
-                    openUploadingDialog = false
+                openDialog = openAddUploadingDialog,
+
+                onDismiss = { openAddUploadingDialog = false },
+                onConfirm = { newUploadEo ->
+                    viewModel.addUpload(newUploadEo)
+                    openAddUploadingDialog = false
                 }
             )
 
@@ -167,7 +206,7 @@ fun ScreenAddCar(
                     modifier = Modifier.weight(1f),
                     onClick = {
                         workType = WorkType.UPLOADING
-                        openUploadingDialog = true
+                        openAddUploadingDialog = true
                     },
                 ) {
                     Text(text = stringResource(R.string.uploading))

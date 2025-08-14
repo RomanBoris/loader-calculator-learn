@@ -1,6 +1,5 @@
 package com.pobezhkin.loadercalculator.presentation.screens
 
-import android.widget.PopupMenu.OnDismissListener
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
@@ -38,9 +35,9 @@ import androidx.compose.ui.unit.dp
 fun UploadingTrack(
 
     openDialog: Boolean,
-    initialEo: Int = 0,
+    initialEo: Int? = 0,
     onDismiss: () -> Unit,
-    onConfirm: (uploadEo: Int) -> Unit
+    onConfirm: (Int) -> Unit
 
 ){
 

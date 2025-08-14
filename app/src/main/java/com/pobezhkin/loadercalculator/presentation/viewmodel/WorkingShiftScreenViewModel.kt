@@ -13,6 +13,8 @@ import com.pobezhkin.loadercalculator.domain.usecase.GetTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.AddUploadUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.DeleteUploadUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.UpdateUploadUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,11 +25,14 @@ import javax.inject.Inject
 @HiltViewModel
 class WorkingShiftScreenViewModel @Inject constructor(
     private val getTrucksUseCase : GetTrucksUseCase,
-    private val deleteTrucksUseCase : DeleteTrucksUseCase,
     private val addTrucksUseCase : AddTrucksUseCase,
     private val updateTruckUseCase: UpdateTruckUseCase,
+    private val deleteTrucksUseCase : DeleteTrucksUseCase,
+
+    private val getUploadUseCase: GetUploadUseCase,
     private val addUploadUseCase: AddUploadUseCase,
-    private val getUploadUseCase: GetUploadUseCase
+    private val updateUploadUseCase: UpdateUploadUseCase,
+    private val deleteUploadUseCase: DeleteUploadUseCase
 ) : ViewModel() {
 
       private val _trucks = MutableStateFlow<List<LoaderTruckModel>>(emptyList())
@@ -51,10 +56,6 @@ class WorkingShiftScreenViewModel @Inject constructor(
             }
         }
 
-
-
-
-
         fun addTrucks(eo: Int, fz : Int ){
             viewModelScope.launch {
                 addTrucksUseCase(eo , fz)
@@ -77,6 +78,19 @@ class WorkingShiftScreenViewModel @Inject constructor(
     fun addUpload(uploadEo: Int){
         viewModelScope.launch {
             addUploadUseCase(uploadEo)
+        }
+    }
+
+    fun deleteUploadsTruck(uploadTruckModel: UploadTruckModel){
+        viewModelScope.launch {
+            deleteUploadUseCase(uploadTruckModel)
+        }
+    }
+
+
+    fun updateUploadTruck(uploadTruckModel: UploadTruckModel){
+        viewModelScope.launch {
+            updateUploadUseCase(uploadTruckModel)
         }
     }
 

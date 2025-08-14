@@ -22,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
+import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UploadTruckItem(
-    loadedTruckModel : LoaderTruckModel ,
+    upLoaderTruckModel: UploadTruckModel ,
     deleteElement: () -> Unit,
     onLongClick: () -> Unit
 ){
@@ -47,7 +48,7 @@ fun UploadTruckItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = ("ЕО: ${loadedTruckModel.h_unit.toString()}"),
+                text = ("Принято ЕО: ${upLoaderTruckModel.upload.toString()}"),
                 fontSize = 24.sp,
             )
 
