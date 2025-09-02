@@ -66,7 +66,7 @@ fun ScreenAddCar(
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 title = {
                     Text(
@@ -74,7 +74,8 @@ fun ScreenAddCar(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center,
-                        fontSize = 30.sp
+                        fontSize = 30.sp,
+                        style = MaterialTheme.typography.titleLarge
                     )
                 }
             )
@@ -88,6 +89,7 @@ fun ScreenAddCar(
         ) {
             Text(
                 text = stringResource(R.string.add_car),
+                style = MaterialTheme.typography.titleMedium,
                 fontSize = 30.sp,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
@@ -137,11 +139,11 @@ fun ScreenAddCar(
             WorkAlertDialog(
 
                 openDialog = openDialogLoading,
+                initialEo = null, // Для добавления - null
+                initialFz = null, // Для добавления - null
                 onDismiss = { openDialogLoading = false },
                 onConfirm = { amount, freeze ->
-                    Log.d("onConfirm"," EO - $amount, FZ - $freeze")
-                    // Передаем данные во ViewModel
-                    viewModel.addTrucks(eo = amount, fz =  freeze)
+                    viewModel.addTrucks(eo = amount, fz = freeze)
                     openDialogLoading = false
                 }
             )
@@ -149,19 +151,16 @@ fun ScreenAddCar(
             selectedTruck?.let { truck ->
                 WorkAlertDialog(
 
+
                     openDialog = openEditDialog,
-                    initialEo = truck.h_unit,
+                    initialEo = truck.h_unit, // Для редактирования - текущие значения
                     initialFz = truck.fz_h_unit,
                     onDismiss = {
                         openEditDialog = false
                         selectedTruck = null
                     },
-                    onConfirm = { amount , freeze ->
-
-                        val eoValue = amount
-                        val freezeValue = freeze
-
-                        viewModel.updateTrucks(truck.copy(h_unit = eoValue, fz_h_unit = freezeValue))
+                    onConfirm = { amount, freeze ->
+                        viewModel.updateTrucks(truck.copy(h_unit = amount, fz_h_unit = freeze))
                         openEditDialog = false
                         selectedTruck = null
                     }
@@ -170,16 +169,13 @@ fun ScreenAddCar(
             }
 
             selectedUploadTrack?.let{ upLoadTrack ->
+
                 UploadingTrack(
-                        openDialog = openEditUploadingDialog,
-                    initialEo = upLoadTrack.upload,
+                    openDialog = openEditUploadingDialog,
+                    initialEo = upLoadTrack.upload, // Для редактирования - текущее значение
                     onDismiss = { openEditUploadingDialog = false },
                     onConfirm = { newUploadEo ->
-
-                       val downloadEo = newUploadEo
-
-                        viewModel.updateUploadTruck(upLoadTrack.copy(upload = downloadEo))
-
+                        viewModel.updateUploadTruck(upLoadTrack.copy(upload = newUploadEo))
                         openEditUploadingDialog = false
                     }
                 )
@@ -187,7 +183,7 @@ fun ScreenAddCar(
 
             UploadingTrack(
                 openDialog = openAddUploadingDialog,
-
+                initialEo = null, // Для добавления - null
                 onDismiss = { openAddUploadingDialog = false },
                 onConfirm = { newUploadEo ->
                     viewModel.addUpload(newUploadEo)

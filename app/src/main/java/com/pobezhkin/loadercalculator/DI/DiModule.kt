@@ -26,7 +26,7 @@ object DiModule {
     private val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("""
-                CREATE TABLE upload_records (
+                CREATE TABLE uploader_trucks (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     count INTEGER NOT NULL,
                     timestamp INTEGER DEFAULT 0

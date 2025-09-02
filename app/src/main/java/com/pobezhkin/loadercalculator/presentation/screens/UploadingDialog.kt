@@ -33,26 +33,23 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadingTrack(
-
     openDialog: Boolean,
-    initialEo: Int? = 0,
+    initialEo: Int? = null, // Изменено на nullable
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit
-
-){
-
+) {
     val eoValue = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val isEoError = remember { mutableStateOf(false) }
 
     if (openDialog) {
-        LaunchedEffect (Unit){
-            eoValue.value = initialEo.toString()
+        LaunchedEffect(Unit) {
+            eoValue.value = if (initialEo != null && initialEo > 0) initialEo.toString() else ""
             focusRequester.requestFocus()
         }
     }
 
-    if(openDialog){
+    if (openDialog) {
         BasicAlertDialog(
             onDismissRequest = onDismiss
         ) {
@@ -67,17 +64,17 @@ fun UploadingTrack(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = if (initialEo == 0) "Добавление ЕО" else "Редактирование ЕО",
+                        text = if (initialEo == null) "Добавление ЕО" else "Редактирование ЕО",
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Поле ЕО (обязательное)
-                    TextField(modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
                         value = eoValue.value,
                         onValueChange = { text ->
                             if (text.all { it.isDigit() }) {
@@ -90,45 +87,40 @@ fun UploadingTrack(
                         isError = isEoError.value,
                         supportingText = {
                             if (isEoError.value) {
-                                Text("Обязательное поле", color = Color.Red)
+                                Text("Введите число больше 0", color = Color.Red)
                             }
-                        })
-
-
+                        }
+                    )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Кнопки (выровнены по правому краю)
                     Row(
-                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = onDismiss) {
                             Text("Отмена")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        TextButton(onClick = {
-                            if (eoValue.value.isEmpty()) {
-                                isEoError.value = true
-                            } else {
-                                onConfirm(
-                                    eoValue.value.toInt(),
+                        TextButton(
+                            onClick = {
+                                val eoInt = eoValue.value.toIntOrNull()
 
-                                )
+                                // Проверка: ЕО должно быть числом больше 0
+                                if (eoInt == null || eoInt <= 0) {
+                                    isEoError.value = true
+                                    return@TextButton
+                                }
+
+                                onConfirm(eoInt)
                                 onDismiss()
                             }
-                        }) {
+                        ) {
                             Text("Сохранить")
                         }
                     }
                 }
-
-
-
             }
-
         }
     }
-
-
-
 }
