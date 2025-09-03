@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.LoaderDataBase
 import com.pobezhkin.loadercalculator.data.workshift.repository.LoaderRepositoryImpl
+import com.pobezhkin.loadercalculator.data.workshift.repository.MiniTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.repository.UploadTruckDao
 import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
 import dagger.Module
@@ -35,6 +36,18 @@ object DiModule {
         }
     }
 
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("""
+            CREATE TABLE mini_loaded_trucks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                miniTruck_eo INTEGER NOT NULL,
+                miniTruck_fz_eo INTEGER NOT NULL
+            )
+        """)
+        }
+    }
+
     @Provides
     @Singleton
     fun providesLoaderDataBase(@ApplicationContext context : Context) : LoaderDataBase {
@@ -42,9 +55,11 @@ object DiModule {
             context,
             LoaderDataBase::class.java,
             "loaded_trucks.db"
-        ).addMigrations(MIGRATION_1_2)
+        ).addMigrations(MIGRATION_1_2,MIGRATION_2_3 )
             .build()
     }
+
+
 
     @Provides
     @Singleton
@@ -60,10 +75,19 @@ object DiModule {
 
     @Provides
     @Singleton
-    fun provideItemRepository(loadedTruckDao : LoadedTruckDao, uploadTruckDao : UploadTruckDao ): LoaderRepository {
+    fun provideMiniTruckDao(loaderDataBase: LoaderDataBase): MiniTruckDao {
+        return loaderDataBase.miniTruckDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideItemRepository(loadedTruckDao : LoadedTruckDao,
+                              uploadTruckDao : UploadTruckDao,
+                              miniTruckDao: MiniTruckDao ): LoaderRepository {
         return LoaderRepositoryImpl(
             loadedTruckDao,
-            uploadTruckDao
+            uploadTruckDao,
+            miniTruckDao
         )
     }
 
