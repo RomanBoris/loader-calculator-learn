@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Loader calculator</string>
     <string name="list_of_cars">Список машин</string>
-    <string name="_12_5_weight">12/5 тонн</string>
-    <string name="_20_weight">20 тонн</string>
+    <string name="_12_5_weight">12/7/5</string>
+    <string name="_20_weight">20Т</string>
     <string name="add_car">Добавь машину</string>
-    <string name="uploading">Приемка</string>
+    <string name="uploading">ВЫГР</string>
 </resources>

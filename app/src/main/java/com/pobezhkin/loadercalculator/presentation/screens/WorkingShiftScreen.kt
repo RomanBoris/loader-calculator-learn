@@ -3,6 +3,7 @@ package com.pobezhkin.loadercalculator.presentation.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pobezhkin.loadercalculator.R
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
+import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
 import com.pobezhkin.loadercalculator.domain.model.UnionTruckItem
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.model.WorkType
@@ -59,33 +62,26 @@ fun ScreenAddCar(
     var openAddUploadingDialog by remember { mutableStateOf(false) }
     var openEditUploadingDialog by remember { mutableStateOf(false) }
     var openDialogLoading by remember { mutableStateOf(false) }
-    var openEditDialog by remember { mutableStateOf(false) } // Для редактирования
+    var openEditDialog by remember { mutableStateOf(false) }
     var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }
     var selectedUploadTrack by remember { mutableStateOf<UploadTruckModel?>(null) }
-    var workType by remember { mutableStateOf(WorkType.LOADING) }
+    var workType by remember { mutableStateOf(WorkType.LOADING_20_T) }
+    var selectedMiniTruck by remember { mutableStateOf<MiniTruckModel?>(null) }
 
     val lazyColumnState = rememberLazyListState()
     val trucks by viewModel.trucks.collectAsState(initial = emptyList())
     val upLoad by viewModel.uploads.collectAsState(initial = emptyList())
+    val miniTrucks by viewModel.miniTruck.collectAsState(initial = emptyList())
 
-    val unionTruckList = remember(trucks, upLoad) {
-        trucks.map { UnionTruckItem.LoadingTruck(it) } + upLoad.map {
-            UnionTruckItem.UpLoadingTruck(
-                it
-            )
-        }
-    }
-
-
+    val unionTruckList = trucks.map { UnionTruckItem.LoadingTruck(it) } +
+            upLoad.map { UnionTruckItem.UpLoadingTruck(it) } +
+            miniTrucks.map { UnionTruckItem.LoadingMiniTruck(it) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-
         containerColor = BluePalette.Background,
-        // ВАЖНО: обнуляем системные инсетсы у Scaffold и AppBar
         contentWindowInsets = WindowInsets(0),
         topBar = {
-
             CenterAlignedTopAppBar(
                 modifier = Modifier.padding(16.dp),
                 windowInsets = WindowInsets(0),
@@ -96,32 +92,27 @@ fun ScreenAddCar(
                     actionIconContentColor = BluePalette.TextPrimary
                 ),
                 title = {
-
-                            Text(
-                                text = stringResource(R.string.list_of_cars),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center,
-                                fontSize = 30.sp,
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.padding(16.dp)
-                            )
-
+                    Text(
+                        text = stringResource(R.string.list_of_cars),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
             )
         }
     ) { innerPadding ->
-        // innerPadding уже без системных отступов (но с отступом под AppBar)
         Box(Modifier.fillMaxSize()) {
-            // Если нужен чистый цвет — закомментируй
             TruckPatternBackground()
 
-            // Контент: добавим только нижний отступ от навбара
-            androidx.compose.foundation.layout.Column(
+            Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(innerPadding) // отступ под AppBar
-                    .navigationBarsPadding() // чтобы кнопки не упирались в навбар
+                    .padding(innerPadding)
+                    .navigationBarsPadding()
                     .fillMaxSize()
             ) {
                 Text(
@@ -134,23 +125,30 @@ fun ScreenAddCar(
 
                 LazyColumn(
                     state = lazyColumnState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
+                    modifier = Modifier.weight(1f)
                 ) {
-                    items(unionTruckList.size) { index ->
-                        when (val item = unionTruckList[index]) {
+                    items(
+                        items = unionTruckList,
+                        key = { item ->
+                            when (item) {
+                                is UnionTruckItem.LoadingTruck -> "LT_${item.truck.id}"
+                                is UnionTruckItem.UpLoadingTruck -> "UT_${item.upload.id}"
+                                is UnionTruckItem.LoadingMiniTruck -> "MT_${item.miniTruck.id}"
+                            }
+                        }
+                    ) { item ->
+                        when (item) {
                             is UnionTruckItem.LoadingTruck -> {
                                 TruckItem(
-                                    loadedTruckModel = item.truck,
+                                    variableTruck = item.truck,
                                     deleteElement = { viewModel.deleteTrucks(item.truck) },
                                     onLongClick = {
                                         selectedTruck = item.truck
+                                        workType = WorkType.LOADING_20_T
                                         openEditDialog = true
                                     }
                                 )
                             }
-
                             is UnionTruckItem.UpLoadingTruck -> {
                                 UploadTruckItem(
                                     upLoaderTruckModel = item.upload,
@@ -161,65 +159,22 @@ fun ScreenAddCar(
                                     }
                                 )
                             }
+                            is UnionTruckItem.LoadingMiniTruck -> {
+                                TruckItem(
+                                    variableTruck = item.miniTruck,
+                                    deleteElement = { viewModel.deleteMiniTrucks(item.miniTruck) },
+                                    onLongClick = {
+                                        selectedMiniTruck = item.miniTruck
+                                        workType = WorkType.LOADING_12_7_5_T
+                                        openEditDialog = true
+                                    }
+                                )
+                            }
                         }
                     }
                 }
 
-                // Диалог добавления погрузки
-                WorkAlertDialog(
-                    openDialog = openDialogLoading,
-                    initialEo = null,
-                    initialFz = null,
-                    onDismiss = { openDialogLoading = false },
-                    onConfirm = { amount, freeze ->
-                        viewModel.addTrucks(eo = amount, fz = freeze)
-                        openDialogLoading = false
-                    }
-                )
-
-                // Диалог редактирования погрузки
-                selectedTruck?.let { truck ->
-                    WorkAlertDialog(
-                        openDialog = openEditDialog,
-                        initialEo = truck.h_unit,
-                        initialFz = truck.fz_h_unit,
-                        onDismiss = {
-                            openEditDialog = false
-                            selectedTruck = null
-                        },
-                        onConfirm = { amount, freeze ->
-                            viewModel.updateTrucks(truck.copy(h_unit = amount, fz_h_unit = freeze))
-                            openEditDialog = false
-                            selectedTruck = null
-                        }
-                    )
-                }
-
-                // Диалог редактирования разгрузки
-                selectedUploadTrack?.let { upLoadTrack ->
-                    UploadingTrack(
-                        openDialog = openEditUploadingDialog,
-                        initialEo = upLoadTrack.upload,
-                        onDismiss = { openEditUploadingDialog = false },
-                        onConfirm = { newUploadEo ->
-                            viewModel.updateUploadTruck(upLoadTrack.copy(upload = newUploadEo))
-                            openEditUploadingDialog = false
-                        }
-                    )
-                }
-
-                // Диалог добавления разгрузки
-                UploadingTrack(
-                    openDialog = openAddUploadingDialog,
-                    initialEo = null,
-                    onDismiss = { openAddUploadingDialog = false },
-                    onConfirm = { newUploadEo ->
-                        viewModel.addUpload(newUploadEo)
-                        openAddUploadingDialog = false
-                    }
-                )
-
-                // Кнопки снизу
+                // Кнопки размещаем здесь - над нижним баром
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -243,7 +198,7 @@ fun ScreenAddCar(
                     OutlinedButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            workType = WorkType.LOADING
+                            workType = WorkType.LOADING_20_T
                             openDialogLoading = true
                         },
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -258,7 +213,7 @@ fun ScreenAddCar(
                     OutlinedButton(
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            workType = WorkType.LOADING
+                            workType = WorkType.LOADING_12_7_5_T
                             openDialogLoading = true
                         },
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -270,12 +225,95 @@ fun ScreenAddCar(
                 }
             }
         }
+
+        // Диалоги
+        if (openDialogLoading) {
+            WorkAlertDialog(
+                openDialog = openDialogLoading,
+                initialEo = 0,
+                initialFz = 0,
+                onDismiss = { openDialogLoading = false },
+                onConfirm = { amount, freeze ->
+                    when (workType) {
+                        WorkType.LOADING_20_T -> viewModel.addTrucks(amount, freeze)
+                        WorkType.LOADING_12_7_5_T -> viewModel.addMiniTrucks(amount, freeze)
+                        WorkType.UPLOADING -> {}
+                    }
+                    openDialogLoading = false
+                }
+            )
+        }
+
+        if (openEditDialog) {
+            when (workType) {
+                WorkType.LOADING_20_T -> {
+                    selectedTruck?.let { truck ->
+                        WorkAlertDialog(
+                            openDialog = openEditDialog,
+                            initialEo = truck.h_unit,
+                            initialFz = truck.fz_h_unit,
+                            onDismiss = {
+                                openEditDialog = false
+                                selectedTruck = null
+                            },
+                            onConfirm = { amount, freeze ->
+                                viewModel.updateTrucks(
+                                    truck.copy(h_unit = amount, fz_h_unit = freeze)
+                                )
+                                openEditDialog = false
+                                selectedTruck = null
+                            }
+                        )
+                    }
+                }
+                WorkType.LOADING_12_7_5_T -> {
+                    selectedMiniTruck?.let { miniTruck ->
+                        WorkAlertDialog(
+                            openDialog = openEditDialog,
+                            initialEo = miniTruck.mini_eo,
+                            initialFz = miniTruck.mini_fz_eo,
+                            onDismiss = {
+                                openEditDialog = false
+                                selectedMiniTruck = null
+                            },
+                            onConfirm = { amount, freeze ->
+                                viewModel.updateMiniTrucks(
+                                    miniTruck.copy(mini_eo = amount, mini_fz_eo = freeze)
+                                )
+                                openEditDialog = false
+                                selectedMiniTruck = null
+                            }
+                        )
+                    }
+                }
+                WorkType.UPLOADING -> {}
+            }
+        }
+
+        if (openEditUploadingDialog) {
+            selectedUploadTrack?.let { upLoadTrack ->
+                UploadingTrack(
+                    openDialog = openEditUploadingDialog,
+                    initialEo = upLoadTrack.upload,
+                    onDismiss = { openEditUploadingDialog = false },
+                    onConfirm = { newUploadEo ->
+                        viewModel.updateUploadTruck(upLoadTrack.copy(upload = newUploadEo))
+                        openEditUploadingDialog = false
+                    }
+                )
+            }
+        }
+
+        if (openAddUploadingDialog) {
+            UploadingTrack(
+                openDialog = openAddUploadingDialog,
+                initialEo = null,
+                onDismiss = { openAddUploadingDialog = false },
+                onConfirm = { newUploadEo ->
+                    viewModel.addUpload(newUploadEo)
+                    openAddUploadingDialog = false
+                }
+            )
+        }
     }
-
 }
-
-
-
-
-/*onClick = { viewModel.addTrucks(trucks.size + 1, trucks.size + 1  )},*/
-

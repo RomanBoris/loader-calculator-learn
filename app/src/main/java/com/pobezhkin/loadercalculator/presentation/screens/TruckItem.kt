@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,12 +28,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
+import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TruckItem(
-    loadedTruckModel: LoaderTruckModel,
+    variableTruck: Any,
     deleteElement: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -43,11 +45,24 @@ fun TruckItem(
     val textPrimary = Color(0xFFEAEAF7)
     val textSecondary = Color(0xFFB6BBD7)
 
+// Определяем текст в зависимости от типа грузовика
+    val (titleText, subtitleText) = when (variableTruck) {
+        is LoaderTruckModel -> Pair(
+            "Отгр.ЕО: ${variableTruck.h_unit}",
+            "Мороз: ${variableTruck.fz_h_unit}"
+        )
+        is MiniTruckModel -> Pair(
+            "Мини ЕО: ${variableTruck.mini_eo}",
+            "Мороз: ${variableTruck.mini_fz_eo}"
+        )
+        else -> Pair("", "")
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp) // внешний отступ как у карточки
-            .height(56.dp) // немного выше для кликабельности
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .height(56.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(
                 Brush.horizontalGradient(listOf(cardStart, cardEnd))
@@ -56,25 +71,28 @@ fun TruckItem(
                 onClick = {},
                 onLongClick = onLongClick
             )
-            .padding(horizontal = 16.dp), // внутренние отступы «карточки»
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "Отгр.ЕО: ${loadedTruckModel.h_unit}",
-            style = MaterialTheme.typography.bodyLarge,
-            color = textPrimary
-        )
-
-        Text(
-            text = "Мороз: ${loadedTruckModel.fz_h_unit}",
-            style = MaterialTheme.typography.bodyLarge,
-            color = textSecondary
-        )
+        Column {
+            Text(
+                text = titleText,
+                style = MaterialTheme.typography.bodyLarge,
+                color = textPrimary
+            )
+            if (subtitleText.isNotEmpty()) {
+                Text(
+                    text = subtitleText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textSecondary
+                )
+            }
+        }
 
         IconButton(
             onClick = deleteElement,
-            modifier = Modifier.size(36.dp) // компактно, но чуть больше 24dp для удобства
+            modifier = Modifier.size(36.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -84,7 +102,6 @@ fun TruckItem(
         }
     }
 }
-
 
 /*@Preview
 @Composable
