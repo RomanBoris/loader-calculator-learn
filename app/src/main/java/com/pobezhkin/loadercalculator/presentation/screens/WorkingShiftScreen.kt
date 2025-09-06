@@ -1,24 +1,26 @@
 package com.pobezhkin.loadercalculator.presentation.screens
 
-import android.util.Log
-import androidx.compose.foundation.layout.Column
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,7 +43,14 @@ import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.model.WorkType
 import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+// Фиксированная палитра (как у погодного)
+object BluePalette {
+    val Background = Color(0xFF0F1C3A)
+    val TextPrimary = Color(0xFFEAEAF7)
+    val TextSecondary = Color(0xFFB6BBD7)
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ScreenAddCar(
     viewModel: WorkingShiftScreenViewModel = hiltViewModel()
@@ -50,199 +59,223 @@ fun ScreenAddCar(
     var openAddUploadingDialog by remember { mutableStateOf(false) }
     var openEditUploadingDialog by remember { mutableStateOf(false) }
     var openDialogLoading by remember { mutableStateOf(false) }
-    var openEditDialog by remember { mutableStateOf(false) }// Для редактирования
-    var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }// Выбранный грузо
-    var selectedUploadTrack by remember { mutableStateOf<UploadTruckModel?>(null) }// Выбранный грузо
+    var openEditDialog by remember { mutableStateOf(false) } // Для редактирования
+    var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }
+    var selectedUploadTrack by remember { mutableStateOf<UploadTruckModel?>(null) }
     var workType by remember { mutableStateOf(WorkType.LOADING) }
+
     val lazyColumnState = rememberLazyListState()
     val trucks by viewModel.trucks.collectAsState(initial = emptyList())
     val upLoad by viewModel.uploads.collectAsState(initial = emptyList())
 
     val unionTruckList = remember(trucks, upLoad) {
-        trucks.map{ UnionTruckItem.LoadingTruck(it) } + upLoad.map { UnionTruckItem.UpLoadingTruck(it) }
+        trucks.map { UnionTruckItem.LoadingTruck(it) } + upLoad.map {
+            UnionTruckItem.UpLoadingTruck(
+                it
+            )
+        }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize().systemBarsPadding(),
 
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+
+        containerColor = BluePalette.Background,
+        // ВАЖНО: обнуляем системные инсетсы у Scaffold и AppBar
+        contentWindowInsets = WindowInsets(0),
         topBar = {
+
             CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                modifier = Modifier.padding(16.dp),
+                windowInsets = WindowInsets(0),
+                colors = centerAlignedTopAppBarColors(
+                    containerColor = BluePalette.Background,
+                    titleContentColor = BluePalette.TextPrimary,
+                    navigationIconContentColor = BluePalette.TextPrimary,
+                    actionIconContentColor = BluePalette.TextPrimary
                 ),
                 title = {
-                    Text(
-                        stringResource(R.string.list_of_cars),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        fontSize = 30.sp,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-            )
-        },
 
-                containerColor = androidx.compose.ui.graphics.Color.Transparent
-    ) { innerPadding ->
-        TruckPatternBackground()
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            Text(
-                text = stringResource(R.string.add_car),
-                style = MaterialTheme.typography.titleMedium,
-                fontSize = 30.sp,
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
-
-            LazyColumn(
-
-                state = lazyColumnState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(innerPadding)
-
-            ) {
-
-                items(unionTruckList) { LoadAndUpload ->
-                    when (LoadAndUpload) {
-                    is UnionTruckItem.LoadingTruck -> {
-                        TruckItem(
-                            loadedTruckModel = LoadAndUpload.truck,
-                            deleteElement = { viewModel.deleteTrucks(LoadAndUpload.truck) },
-                            onLongClick = {
-                                selectedTruck = LoadAndUpload.truck
-                                openEditDialog = true
-                            }
-                        )
-                    }
-
-                        is UnionTruckItem.UpLoadingTruck -> {
-                            UploadTruckItem(
-                                upLoaderTruckModel = LoadAndUpload.upload,
-                                deleteElement = { viewModel.deleteUploadsTruck(LoadAndUpload.upload) },
-
-                            onLongClick = {
-                                selectedUploadTrack = LoadAndUpload.upload
-                                openEditUploadingDialog = true
-                            }
+                            Text(
+                                text = stringResource(R.string.list_of_cars),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center,
+                                fontSize = 30.sp,
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.padding(16.dp)
                             )
 
-                        }
-
-
-                }
-            }
-
-
-            }
-
-            // ВЫЗВАТЬ АЛЕРДИАЛОГ
-            WorkAlertDialog(
-
-                openDialog = openDialogLoading,
-                initialEo = null, // Для добавления - null
-                initialFz = null, // Для добавления - null
-                onDismiss = { openDialogLoading = false },
-                onConfirm = { amount, freeze ->
-                    viewModel.addTrucks(eo = amount, fz = freeze)
-                    openDialogLoading = false
                 }
             )
+        }
+    ) { innerPadding ->
+        // innerPadding уже без системных отступов (но с отступом под AppBar)
+        Box(Modifier.fillMaxSize()) {
+            // Если нужен чистый цвет — закомментируй
+            TruckPatternBackground()
 
-            selectedTruck?.let { truck ->
-                WorkAlertDialog(
-
-
-                    openDialog = openEditDialog,
-                    initialEo = truck.h_unit, // Для редактирования - текущие значения
-                    initialFz = truck.fz_h_unit,
-                    onDismiss = {
-                        openEditDialog = false
-                        selectedTruck = null
-                    },
-                    onConfirm = { amount, freeze ->
-                        viewModel.updateTrucks(truck.copy(h_unit = amount, fz_h_unit = freeze))
-                        openEditDialog = false
-                        selectedTruck = null
-                    }
-                )
-
-            }
-
-            selectedUploadTrack?.let{ upLoadTrack ->
-
-                UploadingTrack(
-                    openDialog = openEditUploadingDialog,
-                    initialEo = upLoadTrack.upload, // Для редактирования - текущее значение
-                    onDismiss = { openEditUploadingDialog = false },
-                    onConfirm = { newUploadEo ->
-                        viewModel.updateUploadTruck(upLoadTrack.copy(upload = newUploadEo))
-                        openEditUploadingDialog = false
-                    }
-                )
-            }
-
-            UploadingTrack(
-                openDialog = openAddUploadingDialog,
-                initialEo = null, // Для добавления - null
-                onDismiss = { openAddUploadingDialog = false },
-                onConfirm = { newUploadEo ->
-                    viewModel.addUpload(newUploadEo)
-                    openAddUploadingDialog = false
-                }
-            )
-
-
-
-            Row(
+            // Контент: добавим только нижний отступ от навбара
+            androidx.compose.foundation.layout.Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(innerPadding) // отступ под AppBar
+                    .navigationBarsPadding() // чтобы кнопки не упирались в навбар
+                    .fillMaxSize()
             ) {
-                OutlinedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        workType = WorkType.UPLOADING
-                        openAddUploadingDialog = true
-                    },
+                Text(
+                    text = stringResource(R.string.add_car),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 30.sp,
+                    color = BluePalette.TextPrimary,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+
+                LazyColumn(
+                    state = lazyColumnState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
                 ) {
-                    Text(text = stringResource(R.string.uploading))
+                    items(unionTruckList.size) { index ->
+                        when (val item = unionTruckList[index]) {
+                            is UnionTruckItem.LoadingTruck -> {
+                                TruckItem(
+                                    loadedTruckModel = item.truck,
+                                    deleteElement = { viewModel.deleteTrucks(item.truck) },
+                                    onLongClick = {
+                                        selectedTruck = item.truck
+                                        openEditDialog = true
+                                    }
+                                )
+                            }
+
+                            is UnionTruckItem.UpLoadingTruck -> {
+                                UploadTruckItem(
+                                    upLoaderTruckModel = item.upload,
+                                    deleteElement = { viewModel.deleteUploadsTruck(item.upload) },
+                                    onLongClick = {
+                                        selectedUploadTrack = item.upload
+                                        openEditUploadingDialog = true
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                // Диалог добавления погрузки
+                WorkAlertDialog(
+                    openDialog = openDialogLoading,
+                    initialEo = null,
+                    initialFz = null,
+                    onDismiss = { openDialogLoading = false },
+                    onConfirm = { amount, freeze ->
+                        viewModel.addTrucks(eo = amount, fz = freeze)
+                        openDialogLoading = false
+                    }
+                )
 
-                OutlinedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = {  workType = WorkType.LOADING
-                        openDialogLoading = true
-                              },
-                ) {
-                    Text(text = stringResource(R.string._20_weight))
+                // Диалог редактирования погрузки
+                selectedTruck?.let { truck ->
+                    WorkAlertDialog(
+                        openDialog = openEditDialog,
+                        initialEo = truck.h_unit,
+                        initialFz = truck.fz_h_unit,
+                        onDismiss = {
+                            openEditDialog = false
+                            selectedTruck = null
+                        },
+                        onConfirm = { amount, freeze ->
+                            viewModel.updateTrucks(truck.copy(h_unit = amount, fz_h_unit = freeze))
+                            openEditDialog = false
+                            selectedTruck = null
+                        }
+                    )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                // Диалог редактирования разгрузки
+                selectedUploadTrack?.let { upLoadTrack ->
+                    UploadingTrack(
+                        openDialog = openEditUploadingDialog,
+                        initialEo = upLoadTrack.upload,
+                        onDismiss = { openEditUploadingDialog = false },
+                        onConfirm = { newUploadEo ->
+                            viewModel.updateUploadTruck(upLoadTrack.copy(upload = newUploadEo))
+                            openEditUploadingDialog = false
+                        }
+                    )
+                }
 
-                OutlinedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        workType = WorkType.LOADING
-                        openDialogLoading = true
+                // Диалог добавления разгрузки
+                UploadingTrack(
+                    openDialog = openAddUploadingDialog,
+                    initialEo = null,
+                    onDismiss = { openAddUploadingDialog = false },
+                    onConfirm = { newUploadEo ->
+                        viewModel.addUpload(newUploadEo)
+                        openAddUploadingDialog = false
+                    }
+                )
 
-                    },
+                // Кнопки снизу
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    Text(text = stringResource(R.string._12_5_weight))
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            workType = WorkType.UPLOADING
+                            openAddUploadingDialog = true
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = BluePalette.TextPrimary
+                        )
+                    ) {
+                        Text(text = stringResource(R.string.uploading))
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            workType = WorkType.LOADING
+                            openDialogLoading = true
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = BluePalette.TextPrimary
+                        )
+                    ) {
+                        Text(text = stringResource(R.string._20_weight))
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            workType = WorkType.LOADING
+                            openDialogLoading = true
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = BluePalette.TextPrimary
+                        )
+                    ) {
+                        Text(text = stringResource(R.string._12_5_weight))
+                    }
                 }
             }
         }
     }
+
 }
+
+
+
 
 /*onClick = { viewModel.addTrucks(trucks.size + 1, trucks.size + 1  )},*/
 

@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WorkingShiftScreenViewModel @Inject constructor(
+open class WorkingShiftScreenViewModel @Inject constructor(
     private val getTrucksUseCase : GetTrucksUseCase,
     private val addTrucksUseCase : AddTrucksUseCase,
     private val updateTruckUseCase: UpdateTruckUseCase,
