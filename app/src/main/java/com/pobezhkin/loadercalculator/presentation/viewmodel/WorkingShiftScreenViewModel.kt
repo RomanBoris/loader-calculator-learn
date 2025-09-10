@@ -18,13 +18,16 @@ import com.pobezhkin.loadercalculator.domain.usecase.AddUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteMiniTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetMiniTrucksUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateMiniTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateUploadUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,9 +46,11 @@ open class WorkingShiftScreenViewModel @Inject constructor(
     private val getMiniTrucksUseCase: GetMiniTrucksUseCase,
     private val addMiniTrucksUseCase: AddMiniTrucksUseCase,
     private val updateMiniTruckUseCase: UpdateMiniTruckUseCase,
-    private val deleteMiniTrucksUseCase: DeleteMiniTrucksUseCase
+    private val deleteMiniTrucksUseCase: DeleteMiniTrucksUseCase,
 
-) : ViewModel() {
+    private val observeDailyPerformanceUseCase: ObserveDailyPerformanceUseCase,
+
+    ) : ViewModel() {
 
       private val _trucks = MutableStateFlow<List<LoaderTruckModel>>(emptyList())
         val trucks : StateFlow<List<LoaderTruckModel>> = _trucks.asStateFlow()
@@ -81,6 +86,10 @@ open class WorkingShiftScreenViewModel @Inject constructor(
 
 
         }
+
+    val performancePercent: StateFlow<Double> =
+        observeDailyPerformanceUseCase(hoursWorked = 11.0)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
 
     fun addMiniTrucks(miniEo: Int, mini_fz_eo : Int ){
         viewModelScope.launch {

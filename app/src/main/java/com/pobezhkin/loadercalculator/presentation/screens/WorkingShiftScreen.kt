@@ -73,6 +73,8 @@ fun ScreenAddCar(
     val upLoad by viewModel.uploads.collectAsState(initial = emptyList())
     val miniTrucks by viewModel.miniTruck.collectAsState(initial = emptyList())
 
+    val percent by viewModel.performancePercent.collectAsState(initial = 0.0)
+
     val unionTruckList = trucks.map { UnionTruckItem.LoadingTruck(it) } +
             upLoad.map { UnionTruckItem.UpLoadingTruck(it) } +
             miniTrucks.map { UnionTruckItem.LoadingMiniTruck(it) }
@@ -93,7 +95,7 @@ fun ScreenAddCar(
                 ),
                 title = {
                     Text(
-                        text = stringResource(R.string.list_of_cars),
+                        text = "СМЕНА 11 ЧАСОВ", // аккуратное форматирование
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center,
@@ -116,7 +118,7 @@ fun ScreenAddCar(
                     .fillMaxSize()
             ) {
                 Text(
-                    text = stringResource(R.string.add_car),
+                    text = "Сделано: ${"%.2f".format(percent)}%",
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 30.sp,
                     color = BluePalette.TextPrimary,

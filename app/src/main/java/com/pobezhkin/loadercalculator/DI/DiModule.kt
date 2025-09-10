@@ -10,6 +10,7 @@ import com.pobezhkin.loadercalculator.data.workshift.repository.LoaderRepository
 import com.pobezhkin.loadercalculator.data.workshift.repository.MiniTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.repository.UploadTruckDao
 import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
+import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -105,5 +106,11 @@ object DiModule {
             miniTruckDao
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideObserveDailyPerformanceUseCase(
+        loaderRepository: LoaderRepository
+    ): ObserveDailyPerformanceUseCase = ObserveDailyPerformanceUseCase(loaderRepository)
 
 }
