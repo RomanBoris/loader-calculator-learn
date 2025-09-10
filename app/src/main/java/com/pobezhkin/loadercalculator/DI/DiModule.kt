@@ -18,52 +18,65 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object DiModule {
 
     // 1. Сначала объявляем миграцию
+    /* private val MIGRATION_1_2 = object : Migration(1, 2) {
+         override fun migrate(database: SupportSQLiteDatabase) {
+             database.execSQL("""
+                 CREATE TABLE uploader_trucks (
+                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     count INTEGER NOT NULL,
+                     timestamp INTEGER DEFAULT 0
+                 )
+             """)
+         }
+     }*/
+
     private val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("""
-                CREATE TABLE uploader_trucks (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    count INTEGER NOT NULL,
-                    timestamp INTEGER DEFAULT 0
-                )
-            """)
+            database.execSQL(
+                """
+        CREATE TABLE IF NOT EXISTS uploader_trucks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            upload_eo INTEGER NOT NULL
+)
+""".trimIndent()
+            )
         }
     }
 
     private val MIGRATION_2_3 = object : Migration(2, 3) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("""
+            database.execSQL(
+                """
             CREATE TABLE mini_loaded_trucks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 miniTruck_eo INTEGER NOT NULL,
                 miniTruck_fz_eo INTEGER NOT NULL
             )
-        """)
+        """
+            )
         }
     }
 
     @Provides
     @Singleton
-    fun providesLoaderDataBase(@ApplicationContext context : Context) : LoaderDataBase {
+    fun providesLoaderDataBase(@ApplicationContext context: Context): LoaderDataBase {
         return Room.databaseBuilder(
             context,
             LoaderDataBase::class.java,
             "loaded_trucks.db"
-        ).addMigrations(MIGRATION_1_2,MIGRATION_2_3 )
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 
 
-
     @Provides
     @Singleton
-    fun provideItemDao(loaderDataBase : LoaderDataBase ): LoadedTruckDao {
+    fun provideItemDao(loaderDataBase: LoaderDataBase): LoadedTruckDao {
         return loaderDataBase.truckDao()
     }
 
@@ -81,9 +94,11 @@ object DiModule {
 
     @Provides
     @Singleton
-    fun provideItemRepository(loadedTruckDao : LoadedTruckDao,
-                              uploadTruckDao : UploadTruckDao,
-                              miniTruckDao: MiniTruckDao ): LoaderRepository {
+    fun provideItemRepository(
+        loadedTruckDao: LoadedTruckDao,
+        uploadTruckDao: UploadTruckDao,
+        miniTruckDao: MiniTruckDao
+    ): LoaderRepository {
         return LoaderRepositoryImpl(
             loadedTruckDao,
             uploadTruckDao,
