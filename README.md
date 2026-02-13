@@ -14,7 +14,11 @@ Android-приложение для учёта работы грузчиков �
   <img src="screenshots/screenshot_2.png" width="250" alt="Добавление записи"/>
 </p>
 
-> Добавьте скриншоты в папку `screenshots/` в корне проекта.
+<p align="center">
+  <img src="screenshots/screenshot_3.png" width="250" alt="Редактирование записи (долгое нажатие)"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/screenshot_4.png" width="250" alt="Расчёт выработки и статистика"/>
+</p>
 
 ## Возможности
 
