@@ -25,3 +25,7 @@ google-services.json
 
 # Gradle
 !gradle/wrapper/gradle-wrapper.jar
+
+# AI assistant cache (Claude)
+.claude/
+.clauде/   # кириллическая "е" — на случай опечатки/бага
