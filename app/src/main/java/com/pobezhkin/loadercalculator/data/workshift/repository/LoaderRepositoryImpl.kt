@@ -7,12 +7,7 @@ import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
-import com.pobezhkin.loadercalculator.domain.model.toLoaderTruckEntity
-import com.pobezhkin.loadercalculator.domain.model.toLoaderTruckModel
-import com.pobezhkin.loadercalculator.domain.model.toMiniTruckModel
-import com.pobezhkin.loadercalculator.domain.model.toMitiTruckEntity
-import com.pobezhkin.loadercalculator.domain.model.toUploadTruckEntity
-import com.pobezhkin.loadercalculator.domain.model.toUploaderTruckModel
+
 import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
