@@ -8,5 +8,6 @@ data class WorkingShiftUiState(
     val trucks: List<LoaderTruckModel> = emptyList(),
     val uploads: List<UploadTruckModel> = emptyList(),
     val miniTrucks: List<MiniTruckModel> = emptyList(),
-    val performancePercent: Double = 0.0
+    val performancePercent: Double = 0.0,
+    val hoursWorked: Double = 11.0
 )

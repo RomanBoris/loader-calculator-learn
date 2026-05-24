@@ -15,6 +15,7 @@ import com.pobezhkin.loadercalculator.domain.usecase.AddUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteMiniTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetMiniTrucksUseCase
+import com.pobezhkin.loadercalculator.domain.repository.SettingsRepository
 import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateMiniTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateUploadUseCase
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,6 +49,7 @@ open class WorkingShiftScreenViewModel @Inject constructor(
     private val deleteMiniTrucksUseCase: DeleteMiniTrucksUseCase,
 
     private val observeDailyPerformanceUseCase: ObserveDailyPerformanceUseCase,
+    private val settingsRepository: SettingsRepository,
 
     ) : ViewModel() {
 
@@ -55,20 +58,27 @@ open class WorkingShiftScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            combine(
-                getTrucksUseCase(),
-                getUploadUseCase(),
-                getMiniTrucksUseCase(),
-                observeDailyPerformanceUseCase(hoursWorked = 11.0)
-            ) { trucks, uploads, miniTrucks, percent ->
-                WorkingShiftUiState(
-                    trucks = trucks,
-                    uploads = uploads,
-                    miniTrucks = miniTrucks,
-                    performancePercent = percent
-                )
+            settingsRepository.getHoursWorked().flatMapLatest { hours ->
+                combine(
+                    getTrucksUseCase(),
+                    getUploadUseCase(),
+                    getMiniTrucksUseCase(),
+                    observeDailyPerformanceUseCase(hoursWorked = hours)
+                ) { trucks, uploads, miniTrucks, percent ->
+                    WorkingShiftUiState(
+                        trucks = trucks,
+                        uploads = uploads,
+                        miniTrucks = miniTrucks,
+                        performancePercent = percent,
+                        hoursWorked = hours
+                    )
+                }
             }.collect { _uiState.value = it }
         }
+    }
+
+    fun saveHoursWorked(hours: Double) {
+        viewModelScope.launch { settingsRepository.saveHoursWorked(hours) }
     }
 
     fun addMiniTrucks(miniEo: Int, mini_fz_eo : Int ){

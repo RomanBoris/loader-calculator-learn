@@ -1,15 +1,20 @@
 package com.pobezhkin.loadercalculator.DI
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.pobezhkin.loadercalculator.data.settings.SettingsRepositoryImpl
 import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.LoaderDataBase
 import com.pobezhkin.loadercalculator.data.workshift.repository.LoaderRepositoryImpl
 import com.pobezhkin.loadercalculator.data.workshift.repository.MiniTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.repository.UploadTruckDao
 import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
+import com.pobezhkin.loadercalculator.domain.repository.SettingsRepository
 import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import dagger.Module
 import dagger.Provides
@@ -17,6 +22,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 
 @Module
@@ -112,5 +119,15 @@ object DiModule {
     fun provideObserveDailyPerformanceUseCase(
         loaderRepository: LoaderRepository
     ): ObserveDailyPerformanceUseCase = ObserveDailyPerformanceUseCase(loaderRepository)
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+        context.dataStore
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(dataStore: DataStore<Preferences>): SettingsRepository =
+        SettingsRepositoryImpl(dataStore)
 
 }

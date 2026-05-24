@@ -14,15 +14,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,6 +71,7 @@ fun ScreenAddCar(
     var openEditUploadingDialog by remember { mutableStateOf(false) }
     var openDialogLoading by remember { mutableStateOf(false) }
     var openEditDialog by remember { mutableStateOf(false) }
+    var openHoursDialog by remember { mutableStateOf(false) }
     var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }
     var selectedUploadTrack by remember { mutableStateOf<UploadTruckModel?>(null) }
     var workType by remember { mutableStateOf(WorkType.LOADING_20_T) }
@@ -87,20 +93,23 @@ fun ScreenAddCar(
                 .navigationBarsPadding()
                 .fillMaxSize()
         ) {
+                val hoursText = if (uiState.hoursWorked % 1.0 == 0.0)
+                    uiState.hoursWorked.toInt().toString() else uiState.hoursWorked.toString()
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     Text(
-                        text = "СМЕНА 11 ЧАСОВ",
+                        text = "СМЕНА $hoursText ЧАСОВ",
                         style = MaterialTheme.typography.titleMedium,
                         fontSize = 18.sp,
                         color = BluePalette.TextSecondary
                     )
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { openHoursDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = "Редактировать смену",
+                            contentDescription = "Редактировать часы смены",
                             tint = BluePalette.TextSecondary
                         )
                     }
@@ -294,6 +303,17 @@ fun ScreenAddCar(
             }
         }
 
+        if (openHoursDialog) {
+            HoursEditDialog(
+                currentHours = uiState.hoursWorked,
+                onDismiss = { openHoursDialog = false },
+                onConfirm = { hours ->
+                    viewModel.saveHoursWorked(hours)
+                    openHoursDialog = false
+                }
+            )
+        }
+
         if (openAddUploadingDialog) {
             UploadingTrack(
                 openDialog = openAddUploadingDialog,
@@ -306,4 +326,43 @@ fun ScreenAddCar(
             )
         }
     } // Box
+}
+
+@Composable
+private fun HoursEditDialog(
+    currentHours: Double,
+    onDismiss: () -> Unit,
+    onConfirm: (Double) -> Unit
+) {
+    var input by remember {
+        val text = if (currentHours % 1.0 == 0.0) currentHours.toInt().toString()
+                   else currentHours.toString()
+        mutableStateOf(text)
+    }
+    val parsed = input.toDoubleOrNull()
+    val isValid = parsed != null && parsed > 0.0
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Длительность смены") },
+        text = {
+            OutlinedTextField(
+                value = input,
+                onValueChange = { input = it },
+                label = { Text("Часов *") },
+                isError = !isValid && input.isNotEmpty(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { if (isValid) onConfirm(parsed!!) },
+                enabled = isValid
+            ) { Text("Сохранить") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Отмена") }
+        }
+    )
 }
