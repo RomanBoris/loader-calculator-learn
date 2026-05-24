@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pobezhkin.loadercalculator.presentation.screens.HistoryScreen.HistoryShiftScreen
+import com.pobezhkin.loadercalculator.ui.theme.BluePalette
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)

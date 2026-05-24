@@ -1,4 +1,4 @@
-package com.pobezhkin.loadercalculator.data.workshift.repository
+package com.pobezhkin.loadercalculator.data.workshift
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -8,20 +8,18 @@ import androidx.room.Update
 import com.pobezhkin.loadercalculator.data.model.UploadTruckEntity
 import kotlinx.coroutines.flow.Flow
 
-
 @Dao
 interface UploadTruckDao {
 
     @Query("SELECT * FROM uploader_trucks")
-    fun getAllUploads() : Flow<List<UploadTruckEntity>>
+    fun getAllUploads(): Flow<List<UploadTruckEntity>>
 
     @Insert
     suspend fun insert(upload: UploadTruckEntity)
 
     @Update
-    suspend fun update(upload : UploadTruckEntity)
+    suspend fun update(upload: UploadTruckEntity)
 
     @Delete
     suspend fun delete(upload: UploadTruckEntity)
-
 }

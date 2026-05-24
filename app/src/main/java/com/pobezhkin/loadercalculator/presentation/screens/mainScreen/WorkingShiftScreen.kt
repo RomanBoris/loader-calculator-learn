@@ -35,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,14 +51,7 @@ import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components
 import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.UploadTruckItem
 import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.UploadingTrack
 import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.WorkAlertDialog
-import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenViewModel
-
-// Фиксированная палитра (как у погодного)
-object BluePalette {
-    val Background = Color(0xFF0F1C3A)
-    val TextPrimary = Color(0xFFEAEAF7)
-    val TextSecondary = Color(0xFFB6BBD7)
-}
+import com.pobezhkin.loadercalculator.ui.theme.BluePalette
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable

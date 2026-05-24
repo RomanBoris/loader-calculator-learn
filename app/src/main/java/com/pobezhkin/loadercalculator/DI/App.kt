@@ -1,4 +1,4 @@
-package com.pobezhkin.loadercalculator.DI
+package com.pobezhkin.loadercalculator.di
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

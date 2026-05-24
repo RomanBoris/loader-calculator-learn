@@ -1,4 +1,4 @@
-package com.pobezhkin.loadercalculator.data.workshift.repository
+package com.pobezhkin.loadercalculator.data.workshift
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -15,12 +15,11 @@ interface MiniTruckDao {
     fun getAllMiniTrucks(): Flow<List<MiniTruckEntity>>
 
     @Insert
-    suspend fun insert (mimiTruck: MiniTruckEntity)
+    suspend fun insert(mimiTruck: MiniTruckEntity)
 
     @Delete
-    suspend fun delete (miniTruck: MiniTruckEntity)
+    suspend fun delete(miniTruck: MiniTruckEntity)
 
     @Update
-    suspend fun update (miniTruck: MiniTruckEntity)
-
+    suspend fun update(miniTruck: MiniTruckEntity)
 }

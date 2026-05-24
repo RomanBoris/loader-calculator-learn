@@ -1,4 +1,4 @@
-package com.pobezhkin.loadercalculator.DI
+package com.pobezhkin.loadercalculator.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -10,11 +10,11 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.pobezhkin.loadercalculator.data.settings.SettingsRepositoryImpl
 import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.LoaderDataBase
+import com.pobezhkin.loadercalculator.data.workshift.MiniTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.ShiftHistoryDao
+import com.pobezhkin.loadercalculator.data.workshift.UploadTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.repository.LoaderRepositoryImpl
-import com.pobezhkin.loadercalculator.data.workshift.repository.MiniTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.repository.ShiftHistoryRepositoryImpl
-import com.pobezhkin.loadercalculator.data.workshift.repository.UploadTruckDao
 import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
 import com.pobezhkin.loadercalculator.domain.repository.SettingsRepository
 import com.pobezhkin.loadercalculator.domain.repository.ShiftHistoryRepository
@@ -28,40 +28,41 @@ import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object DiModule {
-
-    // 1. Сначала объявляем миграцию
-    /* private val MIGRATION_1_2 = object : Migration(1, 2) {
-         override fun migrate(database: SupportSQLiteDatabase) {
-             database.execSQL("""
-                 CREATE TABLE uploader_trucks (
-                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                     count INTEGER NOT NULL,
-                     timestamp INTEGER DEFAULT 0
-                 )
-             """)
-         }
-     }*/
 
     private val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 """
-        CREATE TABLE IF NOT EXISTS uploader_trucks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            upload_eo INTEGER NOT NULL
-)
-""".trimIndent()
+                CREATE TABLE IF NOT EXISTS uploader_trucks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    upload_eo INTEGER NOT NULL
+                )
+                """.trimIndent()
+            )
+        }
+    }
+
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                """
+                CREATE TABLE mini_loaded_trucks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    miniTruck_eo INTEGER NOT NULL,
+                    miniTruck_fz_eo INTEGER NOT NULL
+                )
+                """.trimIndent()
             )
         }
     }
 
     private val MIGRATION_3_4 = object : Migration(3, 4) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("""
+            database.execSQL(
+                """
                 CREATE TABLE IF NOT EXISTS shift_history (
                     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     savedDate INTEGER NOT NULL,
@@ -72,20 +73,7 @@ object DiModule {
                     totalMiniEo INTEGER,
                     totalMiniFzEo INTEGER
                 )
-            """.trimIndent())
-        }
-    }
-
-    private val MIGRATION_2_3 = object : Migration(2, 3) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL(
-                """
-            CREATE TABLE mini_loaded_trucks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                miniTruck_eo INTEGER NOT NULL,
-                miniTruck_fz_eo INTEGER NOT NULL
-            )
-        """
+                """.trimIndent()
             )
         }
     }
@@ -101,24 +89,23 @@ object DiModule {
             .build()
     }
 
+    @Provides
+    @Singleton
+    fun provideItemDao(loaderDataBase: LoaderDataBase): LoadedTruckDao = loaderDataBase.truckDao()
 
     @Provides
     @Singleton
-    fun provideItemDao(loaderDataBase: LoaderDataBase): LoadedTruckDao {
-        return loaderDataBase.truckDao()
-    }
+    fun provideUploadTruckDao(loaderDataBase: LoaderDataBase): UploadTruckDao =
+        loaderDataBase.uploadTruckDao()
 
     @Provides
     @Singleton
-    fun provideUploadTruckDao(loaderDataBase: LoaderDataBase): UploadTruckDao {
-        return loaderDataBase.uploadTruckDao()
-    }
+    fun provideMiniTruckDao(loaderDataBase: LoaderDataBase): MiniTruckDao =
+        loaderDataBase.miniTruckDao()
 
     @Provides
     @Singleton
-    fun provideMiniTruckDao(loaderDataBase: LoaderDataBase): MiniTruckDao {
-        return loaderDataBase.miniTruckDao()
-    }
+    fun provideShiftHistoryDao(db: LoaderDataBase): ShiftHistoryDao = db.shiftHistoryDao()
 
     @Provides
     @Singleton
@@ -126,23 +113,7 @@ object DiModule {
         loadedTruckDao: LoadedTruckDao,
         uploadTruckDao: UploadTruckDao,
         miniTruckDao: MiniTruckDao
-    ): LoaderRepository {
-        return LoaderRepositoryImpl(
-            loadedTruckDao,
-            uploadTruckDao,
-            miniTruckDao
-        )
-    }
-
-    @Provides
-    @Singleton
-    fun provideObserveDailyPerformanceUseCase(
-        loaderRepository: LoaderRepository
-    ): ObserveDailyPerformanceUseCase = ObserveDailyPerformanceUseCase(loaderRepository)
-
-    @Provides
-    @Singleton
-    fun provideShiftHistoryDao(db: LoaderDataBase): ShiftHistoryDao = db.shiftHistoryDao()
+    ): LoaderRepository = LoaderRepositoryImpl(loadedTruckDao, uploadTruckDao, miniTruckDao)
 
     @Provides
     @Singleton
@@ -159,4 +130,9 @@ object DiModule {
     fun provideSettingsRepository(dataStore: DataStore<Preferences>): SettingsRepository =
         SettingsRepositoryImpl(dataStore)
 
+    @Provides
+    @Singleton
+    fun provideObserveDailyPerformanceUseCase(
+        loaderRepository: LoaderRepository
+    ): ObserveDailyPerformanceUseCase = ObserveDailyPerformanceUseCase(loaderRepository)
 }

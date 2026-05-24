@@ -4,6 +4,8 @@ import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
 import com.pobezhkin.loadercalculator.data.model.MiniTruckEntity
 import com.pobezhkin.loadercalculator.data.model.UploadTruckEntity
 import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
+import com.pobezhkin.loadercalculator.data.workshift.MiniTruckDao
+import com.pobezhkin.loadercalculator.data.workshift.UploadTruckDao
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel

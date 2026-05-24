@@ -6,8 +6,6 @@ import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
 import com.pobezhkin.loadercalculator.data.model.MiniTruckEntity
 import com.pobezhkin.loadercalculator.data.model.ShiftHistoryEntity
 import com.pobezhkin.loadercalculator.data.model.UploadTruckEntity
-import com.pobezhkin.loadercalculator.data.workshift.repository.MiniTruckDao
-import com.pobezhkin.loadercalculator.data.workshift.repository.UploadTruckDao
 
 @Database(
     entities = [

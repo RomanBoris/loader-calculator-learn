@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pobezhkin.loadercalculator.presentation.screens.HistoryScreen.components.ShiftHistoryCard
-import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.BluePalette
+import com.pobezhkin.loadercalculator.ui.theme.BluePalette
 
 @Composable
 fun HistoryShiftScreen(

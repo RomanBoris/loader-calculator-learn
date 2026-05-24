@@ -1,44 +1,42 @@
-package com.pobezhkin.loadercalculator.presentation.viewmodel
+package com.pobezhkin.loadercalculator.presentation.screens.mainScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
+import com.pobezhkin.loadercalculator.domain.model.ShiftHistoryModel
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.usecase.AddMiniTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.AddTrucksUseCase
-import com.pobezhkin.loadercalculator.domain.usecase.DeleteTrucksUseCase
-import com.pobezhkin.loadercalculator.domain.usecase.GetTrucksUseCase
-import com.pobezhkin.loadercalculator.domain.usecase.GetUploadUseCase
-import com.pobezhkin.loadercalculator.domain.usecase.UpdateTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.AddUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteMiniTrucksUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.DeleteTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteUploadUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.GetHoursWorkedUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetMiniTrucksUseCase
-import com.pobezhkin.loadercalculator.domain.model.ShiftHistoryModel
-import com.pobezhkin.loadercalculator.domain.repository.SettingsRepository
+import com.pobezhkin.loadercalculator.domain.usecase.GetTrucksUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.GetUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.InsertShiftHistoryUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.SaveHoursWorkedUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateMiniTruckUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.UpdateTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateUploadUseCase
-import com.pobezhkin.loadercalculator.presentation.state.WorkingShiftUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 open class WorkingShiftScreenViewModel @Inject constructor(
-    private val getTrucksUseCase : GetTrucksUseCase,
-    private val addTrucksUseCase : AddTrucksUseCase,
+    private val getTrucksUseCase: GetTrucksUseCase,
+    private val addTrucksUseCase: AddTrucksUseCase,
     private val updateTruckUseCase: UpdateTruckUseCase,
-    private val deleteTrucksUseCase : DeleteTrucksUseCase,
+    private val deleteTrucksUseCase: DeleteTrucksUseCase,
 
     private val getUploadUseCase: GetUploadUseCase,
     private val addUploadUseCase: AddUploadUseCase,
@@ -51,17 +49,17 @@ open class WorkingShiftScreenViewModel @Inject constructor(
     private val deleteMiniTrucksUseCase: DeleteMiniTrucksUseCase,
 
     private val observeDailyPerformanceUseCase: ObserveDailyPerformanceUseCase,
-    private val settingsRepository: SettingsRepository,
+    private val getHoursWorkedUseCase: GetHoursWorkedUseCase,
+    private val saveHoursWorkedUseCase: SaveHoursWorkedUseCase,
     private val insertShiftHistoryUseCase: InsertShiftHistoryUseCase,
-
-    ) : ViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkingShiftUiState())
     val uiState: StateFlow<WorkingShiftUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            settingsRepository.getHoursWorked().flatMapLatest { hours ->
+            getHoursWorkedUseCase().flatMapLatest { hours ->
                 combine(
                     getTrucksUseCase(),
                     getUploadUseCase(),
@@ -81,7 +79,7 @@ open class WorkingShiftScreenViewModel @Inject constructor(
     }
 
     fun saveHoursWorked(hours: Double) {
-        viewModelScope.launch { settingsRepository.saveHoursWorked(hours) }
+        viewModelScope.launch { saveHoursWorkedUseCase(hours) }
     }
 
     fun saveShiftToHistory() {
@@ -101,65 +99,39 @@ open class WorkingShiftScreenViewModel @Inject constructor(
         }
     }
 
-    fun addMiniTrucks(miniEo: Int, mini_fz_eo : Int ){
-        viewModelScope.launch {
-            addMiniTrucksUseCase (miniEo , mini_fz_eo)
-        }
-
+    fun addMiniTrucks(miniEo: Int, mini_fz_eo: Int) {
+        viewModelScope.launch { addMiniTrucksUseCase(miniEo, mini_fz_eo) }
     }
 
-    fun deleteMiniTrucks(miniTruckModel : MiniTruckModel  ){
-        viewModelScope.launch {
-            deleteMiniTrucksUseCase(miniTruckModel)
-        }
+    fun deleteMiniTrucks(miniTruckModel: MiniTruckModel) {
+        viewModelScope.launch { deleteMiniTrucksUseCase(miniTruckModel) }
     }
 
-    fun updateMiniTrucks(miniTruckModel: MiniTruckModel){
-        viewModelScope.launch {
-            updateMiniTruckUseCase(miniTruckModel)
-        }
+    fun updateMiniTrucks(miniTruckModel: MiniTruckModel) {
+        viewModelScope.launch { updateMiniTruckUseCase(miniTruckModel) }
     }
 
-
-
-        fun addTrucks(eo: Int, fz : Int ){
-            viewModelScope.launch {
-                addTrucksUseCase(eo , fz)
-            }
-
-        }
-
-        fun deleteTrucks(loadedTruckModel : LoaderTruckModel  ){
-            viewModelScope.launch {
-               deleteTrucksUseCase(loadedTruckModel)
-            }
-        }
-
-    fun updateTrucks(loadedTruckModel: LoaderTruckModel){
-        viewModelScope.launch {
-            updateTruckUseCase(loadedTruckModel)
-        }
+    fun addTrucks(eo: Int, fz: Int) {
+        viewModelScope.launch { addTrucksUseCase(eo, fz) }
     }
 
-    fun addUpload(uploadEo: Int){
-        viewModelScope.launch {
-            addUploadUseCase(uploadEo)
-        }
+    fun deleteTrucks(loadedTruckModel: LoaderTruckModel) {
+        viewModelScope.launch { deleteTrucksUseCase(loadedTruckModel) }
     }
 
-    fun deleteUploadsTruck(uploadTruckModel: UploadTruckModel){
-        viewModelScope.launch {
-            deleteUploadUseCase(uploadTruckModel)
-        }
+    fun updateTrucks(loadedTruckModel: LoaderTruckModel) {
+        viewModelScope.launch { updateTruckUseCase(loadedTruckModel) }
     }
 
-
-    fun updateUploadTruck(uploadTruckModel: UploadTruckModel){
-        viewModelScope.launch {
-            updateUploadUseCase(uploadTruckModel)
-        }
+    fun addUpload(uploadEo: Int) {
+        viewModelScope.launch { addUploadUseCase(uploadEo) }
     }
 
+    fun deleteUploadsTruck(uploadTruckModel: UploadTruckModel) {
+        viewModelScope.launch { deleteUploadUseCase(uploadTruckModel) }
+    }
 
-
+    fun updateUploadTruck(uploadTruckModel: UploadTruckModel) {
+        viewModelScope.launch { updateUploadUseCase(uploadTruckModel) }
+    }
 }

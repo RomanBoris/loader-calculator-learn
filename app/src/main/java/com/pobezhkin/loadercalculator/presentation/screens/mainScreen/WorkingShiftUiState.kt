@@ -1,4 +1,4 @@
-package com.pobezhkin.loadercalculator.presentation.state
+package com.pobezhkin.loadercalculator.presentation.screens.mainScreen
 
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
