@@ -14,19 +14,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +42,7 @@ import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
 import com.pobezhkin.loadercalculator.domain.model.UnionTruckItem
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.model.WorkType
+import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.HoursEditDialog
 import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.TruckItem
 import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.TruckPatternBackground
 import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.UploadTruckItem
@@ -326,43 +322,4 @@ fun ScreenAddCar(
             )
         }
     } // Box
-}
-
-@Composable
-private fun HoursEditDialog(
-    currentHours: Double,
-    onDismiss: () -> Unit,
-    onConfirm: (Double) -> Unit
-) {
-    var input by remember {
-        val text = if (currentHours % 1.0 == 0.0) currentHours.toInt().toString()
-                   else currentHours.toString()
-        mutableStateOf(text)
-    }
-    val parsed = input.toDoubleOrNull()
-    val isValid = parsed != null && parsed > 0.0
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Длительность смены") },
-        text = {
-            OutlinedTextField(
-                value = input,
-                onValueChange = { input = it },
-                label = { Text("Часов *") },
-                isError = !isValid && input.isNotEmpty(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { if (isValid) onConfirm(parsed!!) },
-                enabled = isValid
-            ) { Text("Сохранить") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Отмена") }
-        }
-    )
 }
