@@ -2,9 +2,11 @@ package com.pobezhkin.loadercalculator.data.workshift.repository
 
 import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
 import com.pobezhkin.loadercalculator.data.model.MiniTruckEntity
+import com.pobezhkin.loadercalculator.data.model.ShiftHistoryEntity
 import com.pobezhkin.loadercalculator.data.model.UploadTruckEntity
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
+import com.pobezhkin.loadercalculator.domain.model.ShiftHistoryModel
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 
 
@@ -40,4 +42,28 @@ fun UploadTruckEntity.toUploaderTruckModel() = UploadTruckModel(
 fun UploadTruckModel.toUploadTruckEntity() = UploadTruckEntity(
     id = id,
     upload = upload
+)
+
+fun ShiftHistoryEntity.toShiftHistoryModel() = ShiftHistoryModel(
+    id = id,
+    savedDate = savedDate,
+    hoursWorked = hoursWorked,
+    totalLoadEo = totalLoadEo,
+    totalLoadFzEo = totalLoadFzEo,
+    totalUploadEo = totalUploadEo,
+    totalMiniEo = totalMiniEo,
+    totalMiniFzEo = totalMiniFzEo,
+    performancePercent = performancePercent
+)
+
+fun ShiftHistoryModel.toShiftHistoryEntity() = ShiftHistoryEntity(
+    id = id,
+    savedDate = savedDate,
+    hoursWorked = hoursWorked,
+    totalLoadEo = totalLoadEo,
+    totalLoadFzEo = totalLoadFzEo,
+    totalUploadEo = totalUploadEo,
+    totalMiniEo = totalMiniEo,
+    totalMiniFzEo = totalMiniFzEo,
+    performancePercent = performancePercent
 )
