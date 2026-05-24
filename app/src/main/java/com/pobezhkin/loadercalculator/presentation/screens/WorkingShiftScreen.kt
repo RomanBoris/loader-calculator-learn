@@ -69,15 +69,11 @@ fun ScreenAddCar(
     var selectedMiniTruck by remember { mutableStateOf<MiniTruckModel?>(null) }
 
     val lazyColumnState = rememberLazyListState()
-    val trucks by viewModel.trucks.collectAsState(initial = emptyList())
-    val upLoad by viewModel.uploads.collectAsState(initial = emptyList())
-    val miniTrucks by viewModel.miniTruck.collectAsState(initial = emptyList())
+    val uiState by viewModel.uiState.collectAsState()
 
-    val percent by viewModel.performancePercent.collectAsState(initial = 0.0)
-
-    val unionTruckList = trucks.map { UnionTruckItem.LoadingTruck(it) } +
-            upLoad.map { UnionTruckItem.UpLoadingTruck(it) } +
-            miniTrucks.map { UnionTruckItem.LoadingMiniTruck(it) }
+    val unionTruckList = uiState.trucks.map { UnionTruckItem.LoadingTruck(it) } +
+            uiState.uploads.map { UnionTruckItem.UpLoadingTruck(it) } +
+            uiState.miniTrucks.map { UnionTruckItem.LoadingMiniTruck(it) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -118,7 +114,7 @@ fun ScreenAddCar(
                     .fillMaxSize()
             ) {
                 Text(
-                    text = "Сделано: ${"%.2f".format(percent)}%",
+                    text = "Сделано: ${"%.2f".format(uiState.performancePercent)}%",
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 30.sp,
                     color = BluePalette.TextPrimary,
