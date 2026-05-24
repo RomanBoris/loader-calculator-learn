@@ -16,13 +16,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -68,6 +72,7 @@ fun ScreenAddCar(
     var openDialogLoading by remember { mutableStateOf(false) }
     var openEditDialog by remember { mutableStateOf(false) }
     var openHoursDialog by remember { mutableStateOf(false) }
+    var openSaveConfirmDialog by remember { mutableStateOf(false) }
     var selectedTruck by remember { mutableStateOf<LoaderTruckModel?>(null) }
     var selectedUploadTrack by remember { mutableStateOf<UploadTruckModel?>(null) }
     var workType by remember { mutableStateOf(WorkType.LOADING_20_T) }
@@ -221,7 +226,38 @@ fun ScreenAddCar(
                 }
             }
 
+        FloatingActionButton(
+            onClick = { openSaveConfirmDialog = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = 88.dp),
+            containerColor = BluePalette.Background,
+            contentColor = BluePalette.TextPrimary
+        ) {
+            Icon(
+                imageVector = Icons.Default.Save,
+                contentDescription = "Сохранить смену в историю"
+            )
+        }
+
         // Диалоги
+        if (openSaveConfirmDialog) {
+            AlertDialog(
+                onDismissRequest = { openSaveConfirmDialog = false },
+                title = { Text("Сохранить смену?") },
+                text = { Text("Вы уверены что хотите сохранить смену в историю?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.saveShiftToHistory()
+                        openSaveConfirmDialog = false
+                    }) { Text("Сохранить") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { openSaveConfirmDialog = false }) { Text("Отмена") }
+                }
+            )
+        }
+
         if (openDialogLoading) {
             WorkAlertDialog(
                 openDialog = openDialogLoading,

@@ -15,7 +15,9 @@ import com.pobezhkin.loadercalculator.domain.usecase.AddUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteMiniTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.DeleteUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetMiniTrucksUseCase
+import com.pobezhkin.loadercalculator.domain.model.ShiftHistoryModel
 import com.pobezhkin.loadercalculator.domain.repository.SettingsRepository
+import com.pobezhkin.loadercalculator.domain.usecase.InsertShiftHistoryUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateMiniTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateUploadUseCase
@@ -50,6 +52,7 @@ open class WorkingShiftScreenViewModel @Inject constructor(
 
     private val observeDailyPerformanceUseCase: ObserveDailyPerformanceUseCase,
     private val settingsRepository: SettingsRepository,
+    private val insertShiftHistoryUseCase: InsertShiftHistoryUseCase,
 
     ) : ViewModel() {
 
@@ -79,6 +82,23 @@ open class WorkingShiftScreenViewModel @Inject constructor(
 
     fun saveHoursWorked(hours: Double) {
         viewModelScope.launch { settingsRepository.saveHoursWorked(hours) }
+    }
+
+    fun saveShiftToHistory() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            insertShiftHistoryUseCase(
+                ShiftHistoryModel(
+                    savedDate = System.currentTimeMillis(),
+                    hoursWorked = state.hoursWorked,
+                    totalLoadEo = state.trucks.sumOf { it.h_unit }.takeIf { it > 0 },
+                    totalLoadFzEo = state.trucks.sumOf { it.fz_h_unit }.takeIf { it > 0 },
+                    totalUploadEo = state.uploads.sumOf { it.upload }.takeIf { it > 0 },
+                    totalMiniEo = state.miniTrucks.sumOf { it.mini_eo }.takeIf { it > 0 },
+                    totalMiniFzEo = state.miniTrucks.sumOf { it.mini_fz_eo }.takeIf { it > 0 }
+                )
+            )
+        }
     }
 
     fun addMiniTrucks(miniEo: Int, mini_fz_eo : Int ){

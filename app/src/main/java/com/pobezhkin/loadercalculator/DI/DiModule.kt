@@ -70,8 +70,7 @@ object DiModule {
                     totalLoadFzEo INTEGER,
                     totalUploadEo INTEGER,
                     totalMiniEo INTEGER,
-                    totalMiniFzEo INTEGER,
-                    performancePercent REAL NOT NULL
+                    totalMiniFzEo INTEGER
                 )
             """.trimIndent())
         }

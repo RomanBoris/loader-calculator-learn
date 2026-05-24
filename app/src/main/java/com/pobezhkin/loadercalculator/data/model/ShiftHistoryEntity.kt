@@ -13,6 +13,5 @@ data class ShiftHistoryEntity(
     val totalLoadFzEo: Int?,
     val totalUploadEo: Int?,
     val totalMiniEo: Int?,
-    val totalMiniFzEo: Int?,
-    val performancePercent: Double
+    val totalMiniFzEo: Int?
 )

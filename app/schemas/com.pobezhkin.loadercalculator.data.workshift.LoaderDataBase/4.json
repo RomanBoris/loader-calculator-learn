@@ -1,0 +1,152 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "8529517972156f4606a46c9463706208",
+    "entities": [
+      {
+        "tableName": "loaded_trucks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `total_eo` INTEGER NOT NULL, `freeze_eo` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "h_unit",
+            "columnName": "total_eo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fz_h_unit",
+            "columnName": "freeze_eo",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "uploader_trucks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `upload_eo` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "upload",
+            "columnName": "upload_eo",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "mini_loaded_trucks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `miniTruck_eo` INTEGER NOT NULL, `miniTruck_fz_eo` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mini_eo",
+            "columnName": "miniTruck_eo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mini_fz_eo",
+            "columnName": "miniTruck_fz_eo",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "shift_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `savedDate` INTEGER NOT NULL, `hoursWorked` REAL NOT NULL, `totalLoadEo` INTEGER, `totalLoadFzEo` INTEGER, `totalUploadEo` INTEGER, `totalMiniEo` INTEGER, `totalMiniFzEo` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "savedDate",
+            "columnName": "savedDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hoursWorked",
+            "columnName": "hoursWorked",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalLoadEo",
+            "columnName": "totalLoadEo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "totalLoadFzEo",
+            "columnName": "totalLoadFzEo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "totalUploadEo",
+            "columnName": "totalUploadEo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "totalMiniEo",
+            "columnName": "totalMiniEo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "totalMiniFzEo",
+            "columnName": "totalMiniFzEo",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8529517972156f4606a46c9463706208')"
+    ]
+  }
+}

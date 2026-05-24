@@ -52,8 +52,7 @@ fun ShiftHistoryEntity.toShiftHistoryModel() = ShiftHistoryModel(
     totalLoadFzEo = totalLoadFzEo,
     totalUploadEo = totalUploadEo,
     totalMiniEo = totalMiniEo,
-    totalMiniFzEo = totalMiniFzEo,
-    performancePercent = performancePercent
+    totalMiniFzEo = totalMiniFzEo
 )
 
 fun ShiftHistoryModel.toShiftHistoryEntity() = ShiftHistoryEntity(
@@ -64,6 +63,5 @@ fun ShiftHistoryModel.toShiftHistoryEntity() = ShiftHistoryEntity(
     totalLoadFzEo = totalLoadFzEo,
     totalUploadEo = totalUploadEo,
     totalMiniEo = totalMiniEo,
-    totalMiniFzEo = totalMiniFzEo,
-    performancePercent = performancePercent
+    totalMiniFzEo = totalMiniFzEo
 )

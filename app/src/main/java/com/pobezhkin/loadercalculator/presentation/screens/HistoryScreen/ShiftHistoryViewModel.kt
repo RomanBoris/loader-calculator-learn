@@ -7,7 +7,6 @@ import com.pobezhkin.loadercalculator.domain.usecase.DeleteShiftHistoryUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetShiftHistoryUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.InsertShiftHistoryUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateShiftHistoryUseCase
-import com.pobezhkin.loadercalculator.presentation.screens.HistoryScreen.ShiftHistoryUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
