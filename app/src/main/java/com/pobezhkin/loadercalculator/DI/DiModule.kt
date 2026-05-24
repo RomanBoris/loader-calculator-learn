@@ -10,11 +10,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.pobezhkin.loadercalculator.data.settings.SettingsRepositoryImpl
 import com.pobezhkin.loadercalculator.data.workshift.LoadedTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.LoaderDataBase
+import com.pobezhkin.loadercalculator.data.workshift.ShiftHistoryDao
 import com.pobezhkin.loadercalculator.data.workshift.repository.LoaderRepositoryImpl
 import com.pobezhkin.loadercalculator.data.workshift.repository.MiniTruckDao
+import com.pobezhkin.loadercalculator.data.workshift.repository.ShiftHistoryRepositoryImpl
 import com.pobezhkin.loadercalculator.data.workshift.repository.UploadTruckDao
 import com.pobezhkin.loadercalculator.domain.repository.LoaderRepository
 import com.pobezhkin.loadercalculator.domain.repository.SettingsRepository
+import com.pobezhkin.loadercalculator.domain.repository.ShiftHistoryRepository
 import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import dagger.Module
 import dagger.Provides
@@ -56,6 +59,24 @@ object DiModule {
         }
     }
 
+    private val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("""
+                CREATE TABLE IF NOT EXISTS shift_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    savedDate INTEGER NOT NULL,
+                    hoursWorked REAL NOT NULL,
+                    totalLoadEo INTEGER,
+                    totalLoadFzEo INTEGER,
+                    totalUploadEo INTEGER,
+                    totalMiniEo INTEGER,
+                    totalMiniFzEo INTEGER,
+                    performancePercent REAL NOT NULL
+                )
+            """.trimIndent())
+        }
+    }
+
     private val MIGRATION_2_3 = object : Migration(2, 3) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -77,7 +98,7 @@ object DiModule {
             context,
             LoaderDataBase::class.java,
             "loaded_trucks.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
     }
 
@@ -119,6 +140,15 @@ object DiModule {
     fun provideObserveDailyPerformanceUseCase(
         loaderRepository: LoaderRepository
     ): ObserveDailyPerformanceUseCase = ObserveDailyPerformanceUseCase(loaderRepository)
+
+    @Provides
+    @Singleton
+    fun provideShiftHistoryDao(db: LoaderDataBase): ShiftHistoryDao = db.shiftHistoryDao()
+
+    @Provides
+    @Singleton
+    fun provideShiftHistoryRepository(dao: ShiftHistoryDao): ShiftHistoryRepository =
+        ShiftHistoryRepositoryImpl(dao)
 
     @Provides
     @Singleton

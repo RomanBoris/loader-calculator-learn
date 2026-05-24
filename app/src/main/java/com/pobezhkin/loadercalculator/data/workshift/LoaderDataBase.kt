@@ -4,22 +4,32 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
 import com.pobezhkin.loadercalculator.data.model.MiniTruckEntity
+import com.pobezhkin.loadercalculator.data.model.ShiftHistoryEntity
 import com.pobezhkin.loadercalculator.data.model.UploadTruckEntity
 import com.pobezhkin.loadercalculator.data.workshift.repository.MiniTruckDao
 import com.pobezhkin.loadercalculator.data.workshift.repository.UploadTruckDao
 
+@Database(
+    entities = [
+        LoaderTruckEntity::class,
+        UploadTruckEntity::class,
+        MiniTruckEntity::class,
+        ShiftHistoryEntity::class
+    ],
+    version = 4
+)
+abstract class LoaderDataBase : RoomDatabase() {
 
-@Database(entities = [LoaderTruckEntity::class, UploadTruckEntity::class, MiniTruckEntity::class], version = 3)
-abstract class LoaderDataBase: RoomDatabase() {
+    abstract fun truckDao(): LoadedTruckDao
 
-abstract fun truckDao(): LoadedTruckDao
+    abstract fun miniTruckDao(): MiniTruckDao
 
-abstract fun miniTruckDao(): MiniTruckDao
+    abstract fun uploadTruckDao(): UploadTruckDao
 
-abstract fun uploadTruckDao(): UploadTruckDao
-
+    abstract fun shiftHistoryDao(): ShiftHistoryDao
 }
 
-//1 весия -  большие траки
+//1 версия - большие траки
 //2 версия - добавление выгрузки
-//3 версия - сейчас с добавлением минитраков
+//3 версия - добавление минитраков
+//4 версия - добавление истории смен
