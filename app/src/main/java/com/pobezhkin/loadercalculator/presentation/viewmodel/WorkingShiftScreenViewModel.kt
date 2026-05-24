@@ -2,9 +2,6 @@ package com.pobezhkin.loadercalculator.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
-import com.pobezhkin.loadercalculator.data.model.UploadTruckEntity
-
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
@@ -21,12 +18,13 @@ import com.pobezhkin.loadercalculator.domain.usecase.GetMiniTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateMiniTruckUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateUploadUseCase
+import com.pobezhkin.loadercalculator.presentation.state.WorkingShiftUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,44 +50,26 @@ open class WorkingShiftScreenViewModel @Inject constructor(
 
     ) : ViewModel() {
 
-      private val _trucks = MutableStateFlow<List<LoaderTruckModel>>(emptyList())
-        val trucks : StateFlow<List<LoaderTruckModel>> = _trucks.asStateFlow()
+    private val _uiState = MutableStateFlow(WorkingShiftUiState())
+    val uiState: StateFlow<WorkingShiftUiState> = _uiState.asStateFlow()
 
-    private val _uploads = MutableStateFlow<List<UploadTruckModel>>(emptyList())
-        val uploads : StateFlow<List<UploadTruckModel>> = _uploads.asStateFlow()
-
-    private val _miniTrucks = MutableStateFlow<List<MiniTruckModel>>(emptyList())
-
-    val miniTruck: StateFlow<List<MiniTruckModel>> = _miniTrucks.asStateFlow()
-
-        init {
-            // Подписываемся на поток данных из репозитория
-            viewModelScope.launch {
-                getTrucksUseCase().collect { trucksList ->
-                    _trucks.value = trucksList
-                }
-            }
-
-            viewModelScope.launch {
-                getUploadUseCase().collect { uploadsList ->
-                    _uploads.value = uploadsList
-                }
-            }
-
-            viewModelScope.launch {
-                getMiniTrucksUseCase().collect {  miniTruckList ->
-                    _miniTrucks.value = miniTruckList
-
-                }
-            }
-
-
-
+    init {
+        viewModelScope.launch {
+            combine(
+                getTrucksUseCase(),
+                getUploadUseCase(),
+                getMiniTrucksUseCase(),
+                observeDailyPerformanceUseCase(hoursWorked = 11.0)
+            ) { trucks, uploads, miniTrucks, percent ->
+                WorkingShiftUiState(
+                    trucks = trucks,
+                    uploads = uploads,
+                    miniTrucks = miniTrucks,
+                    performancePercent = percent
+                )
+            }.collect { _uiState.value = it }
         }
-
-    val performancePercent: StateFlow<Double> =
-        observeDailyPerformanceUseCase(hoursWorked = 11.0)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+    }
 
     fun addMiniTrucks(miniEo: Int, mini_fz_eo : Int ){
         viewModelScope.launch {
