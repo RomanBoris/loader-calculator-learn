@@ -14,8 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -83,12 +87,31 @@ fun ScreenAddCar(
                 .navigationBarsPadding()
                 .fillMaxSize()
         ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text(
+                        text = "СМЕНА 11 ЧАСОВ",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontSize = 18.sp,
+                        color = BluePalette.TextSecondary
+                    )
+                    IconButton(onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Редактировать смену",
+                            tint = BluePalette.TextSecondary
+                        )
+                    }
+                }
+
                 Text(
                     text = "Сделано: ${"%.2f".format(uiState.performancePercent)}%",
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 30.sp,
                     color = BluePalette.TextPrimary,
-                    modifier = Modifier.padding(vertical = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 LazyColumn(
