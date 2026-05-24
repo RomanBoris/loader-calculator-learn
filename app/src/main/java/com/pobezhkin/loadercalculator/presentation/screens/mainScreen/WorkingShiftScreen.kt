@@ -1,4 +1,4 @@
-package com.pobezhkin.loadercalculator.presentation.screens
+package com.pobezhkin.loadercalculator.presentation.screens.mainScreen
 
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -44,6 +44,11 @@ import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
 import com.pobezhkin.loadercalculator.domain.model.UnionTruckItem
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.model.WorkType
+import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.TruckItem
+import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.TruckPatternBackground
+import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.UploadTruckItem
+import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.UploadingTrack
+import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.WorkAlertDialog
 import com.pobezhkin.loadercalculator.presentation.viewmodel.WorkingShiftScreenViewModel
 
 // Фиксированная палитра (как у погодного)

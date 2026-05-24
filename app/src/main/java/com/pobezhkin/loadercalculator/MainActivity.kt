@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
-import com.pobezhkin.loadercalculator.presentation.screens.ScreenAddCar
+import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.ScreenAddCar
 import com.pobezhkin.loadercalculator.ui.theme.LoaderCalculatorTheme
 import dagger.hilt.android.AndroidEntryPoint
 

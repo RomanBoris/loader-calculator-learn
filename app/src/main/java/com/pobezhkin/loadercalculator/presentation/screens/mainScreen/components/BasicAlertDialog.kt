@@ -1,4 +1,4 @@
-package com.pobezhkin.loadercalculator.presentation.screens
+package com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,21 +30,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UploadingTrack(
+fun WorkAlertDialog(
     openDialog: Boolean,
-    initialEo: Int? = null, // Изменено на nullable
+    initialEo: Int? = null,
+    initialFz: Int? = null,
     onDismiss: () -> Unit,
-    onConfirm: (Int) -> Unit
+    onConfirm: (eo: Int, fz: Int) -> Unit
 ) {
     val eoValue = remember { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
+    val fzValue = remember { mutableStateOf("") }
     val isEoError = remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
+    // Инициализация полей при открытии
     if (openDialog) {
         LaunchedEffect(Unit) {
             eoValue.value = if (initialEo != null && initialEo > 0) initialEo.toString() else ""
+            fzValue.value = if (initialFz != null && initialFz > 0) initialFz.toString() else ""
             focusRequester.requestFocus()
         }
     }
@@ -54,10 +59,12 @@ fun UploadingTrack(
             onDismissRequest = onDismiss
         ) {
             Surface(
+
                 modifier = Modifier
                     .width(280.dp)
                     .wrapContentHeight(),
                 shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surface,
                 tonalElevation = AlertDialogDefaults.TonalElevation
             ) {
                 Column(
@@ -66,11 +73,14 @@ fun UploadingTrack(
                     Text(
                         text = if (initialEo == null) "Добавление ЕО" else "Редактирование ЕО",
                         style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
+
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Поле ЕО (обязательное)
                     TextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -92,8 +102,25 @@ fun UploadingTrack(
                         }
                     )
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Поле заморозки (может быть пустым)
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = fzValue.value,
+                        onValueChange = { text ->
+                            if (text.all { it.isDigit() } || text.isEmpty()) {
+                                fzValue.value = text
+                            }
+                        },
+                        label = { Text("Заморозка (FZ)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        placeholder = { Text("Оставьте пустым, если не требуется") }
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // Кнопки (выровнены по правому краю)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
@@ -112,7 +139,10 @@ fun UploadingTrack(
                                     return@TextButton
                                 }
 
-                                onConfirm(eoInt)
+                                // Заморозка может быть null (пустая строка)
+                                val fzInt = fzValue.value.toIntOrNull() ?: 0
+
+                                onConfirm(eoInt, fzInt)
                                 onDismiss()
                             }
                         ) {

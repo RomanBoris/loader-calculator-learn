@@ -1,12 +1,11 @@
-package com.pobezhkin.loadercalculator.presentation.screens
+package com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,15 +24,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.pobezhkin.loadercalculator.data.model.LoaderTruckEntity
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
-import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
+import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun UploadTruckItem(
-    upLoaderTruckModel: UploadTruckModel,
+fun TruckItem(
+    variableTruck: Any,
     deleteElement: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -45,13 +42,28 @@ fun UploadTruckItem(
     val textPrimary = Color(0xFFEAEAF7)
     val textSecondary = Color(0xFFB6BBD7)
 
+// Определяем текст в зависимости от типа грузовика
+    val (titleText, subtitleText) = when (variableTruck) {
+        is LoaderTruckModel -> Pair(
+            "Отгр.ЕО: ${variableTruck.h_unit}",
+            "Мороз: ${variableTruck.fz_h_unit}"
+        )
+        is MiniTruckModel -> Pair(
+            "Мини ЕО: ${variableTruck.mini_eo}",
+            "Мороз: ${variableTruck.mini_fz_eo}"
+        )
+        else -> Pair("", "")
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .height(56.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Brush.horizontalGradient(listOf(cardStart, cardEnd)))
+            .background(
+                Brush.horizontalGradient(listOf(cardStart, cardEnd))
+            )
             .combinedClickable(
                 onClick = {},
                 onLongClick = onLongClick
@@ -60,11 +72,20 @@ fun UploadTruckItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "Принято ЕО: ${upLoaderTruckModel.upload}",
-            style = MaterialTheme.typography.titleMedium,
-            color = textPrimary
-        )
+        Column {
+            Text(
+                text = titleText,
+                style = MaterialTheme.typography.bodyLarge,
+                color = textPrimary
+            )
+            if (subtitleText.isNotEmpty()) {
+                Text(
+                    text = subtitleText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textSecondary
+                )
+            }
+        }
 
         IconButton(
             onClick = deleteElement,
@@ -78,3 +99,9 @@ fun UploadTruckItem(
         }
     }
 }
+
+/*@Preview
+@Composable
+fun PreviewTruckItem(){
+    TruckItem()
+}*/

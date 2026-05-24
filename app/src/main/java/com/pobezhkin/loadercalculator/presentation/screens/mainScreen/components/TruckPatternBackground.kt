@@ -1,20 +1,15 @@
-package com.pobezhkin.loadercalculator.presentation.screens
+package com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.pobezhkin.loadercalculator.R
 
 @Composable
 fun TruckPatternBackground() {
@@ -49,14 +44,14 @@ private fun DrawScope.drawTruck(size: Float) {
     drawRect(
         color = Color.White.copy(alpha = 0.08f),
         topLeft = Offset(0f, size * 0.3f),
-        size = androidx.compose.ui.geometry.Size(size * 0.4f, size * 0.4f)
+        size = Size(size * 0.4f, size * 0.4f)
     )
 
     // Кузов грузовика
     drawRect(
         color = Color.White.copy(alpha = 0.08f),
         topLeft = Offset(size * 0.4f, size * 0.2f),
-        size = androidx.compose.ui.geometry.Size(size * 0.6f, size * 0.6f)
+        size = Size(size * 0.6f, size * 0.6f)
     )
 
     // Переднее колесо
