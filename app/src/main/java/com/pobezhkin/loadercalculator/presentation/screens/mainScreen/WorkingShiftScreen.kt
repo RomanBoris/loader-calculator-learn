@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -255,7 +256,7 @@ fun ScreenAddCarContent(
             onClick = { openSaveConfirmDialog = true },
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 18.dp, top = 28.dp)
+                .padding(start = 18.dp, top = 30.dp)
                 .size(48.dp),
             containerColor = BluePalette.SaveGreen,
             contentColor = Color.White
@@ -263,6 +264,21 @@ fun ScreenAddCarContent(
             Icon(
                 imageVector = Icons.Default.Save,
                 contentDescription = "Сохранить смену в историю"
+            )
+        }
+
+        FloatingActionButton(
+            onClick = { },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 18.dp, top = 30.dp)
+                .size(48.dp),
+            containerColor = BluePalette.SettingsGray,
+            contentColor = Color.White
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Настройки"
             )
         }
 
