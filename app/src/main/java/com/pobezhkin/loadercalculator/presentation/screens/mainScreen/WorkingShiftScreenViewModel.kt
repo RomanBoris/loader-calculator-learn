@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pobezhkin.loadercalculator.domain.model.LoaderTruckModel
 import com.pobezhkin.loadercalculator.domain.model.MiniTruckModel
-import com.pobezhkin.loadercalculator.domain.model.ShiftHistoryModel
 import com.pobezhkin.loadercalculator.domain.model.UploadTruckModel
 import com.pobezhkin.loadercalculator.domain.usecase.AddMiniTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.AddTrucksUseCase
@@ -17,6 +16,7 @@ import com.pobezhkin.loadercalculator.domain.usecase.GetMiniTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetTrucksUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.GetUploadUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.InsertShiftHistoryUseCase
+import com.pobezhkin.loadercalculator.domain.usecase.SaveShiftHistoryUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.ObserveDailyPerformanceUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.SaveHoursWorkedUseCase
 import com.pobezhkin.loadercalculator.domain.usecase.UpdateMiniTruckUseCase
@@ -52,6 +52,7 @@ open class WorkingShiftScreenViewModel @Inject constructor(
     private val getHoursWorkedUseCase: GetHoursWorkedUseCase,
     private val saveHoursWorkedUseCase: SaveHoursWorkedUseCase,
     private val insertShiftHistoryUseCase: InsertShiftHistoryUseCase,
+    private val saveShiftHistoryUseCase: SaveShiftHistoryUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkingShiftUiState())
@@ -85,16 +86,11 @@ open class WorkingShiftScreenViewModel @Inject constructor(
     fun saveShiftToHistory() {
         viewModelScope.launch {
             val state = _uiState.value
-            insertShiftHistoryUseCase(
-                ShiftHistoryModel(
-                    savedDate = System.currentTimeMillis(),
-                    hoursWorked = state.hoursWorked,
-                    totalLoadEo = state.trucks.sumOf { it.h_unit }.takeIf { it > 0 },
-                    totalLoadFzEo = state.trucks.sumOf { it.fz_h_unit }.takeIf { it > 0 },
-                    totalUploadEo = state.uploads.sumOf { it.upload }.takeIf { it > 0 },
-                    totalMiniEo = state.miniTrucks.sumOf { it.mini_eo }.takeIf { it > 0 },
-                    totalMiniFzEo = state.miniTrucks.sumOf { it.mini_fz_eo }.takeIf { it > 0 }
-                )
+            saveShiftHistoryUseCase(
+                trucks = state.trucks,
+                uploads = state.uploads,
+                miniTrucks = state.miniTrucks,
+                hoursWorked = state.hoursWorked
             )
         }
     }
