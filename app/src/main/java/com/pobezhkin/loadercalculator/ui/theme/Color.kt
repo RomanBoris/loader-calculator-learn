@@ -14,4 +14,5 @@ object BluePalette {
     val Background = Color(0xFF0F1C3A)
     val TextPrimary = Color(0xFFEAEAF7)
     val TextSecondary = Color(0xFFB6BBD7)
+    val SaveGreen = Color(0xFF4CAF50)
 }

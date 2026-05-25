@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,8 +35,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,12 +56,44 @@ import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components
 import com.pobezhkin.loadercalculator.presentation.screens.mainScreen.components.WorkAlertDialog
 import com.pobezhkin.loadercalculator.ui.theme.BluePalette
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ScreenAddCar(
     viewModel: WorkingShiftScreenViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
+    ScreenAddCarContent(
+        uiState = uiState,
+        onSaveShift = { viewModel.saveShiftToHistory() },
+        onAddTruck = { amount, freeze -> viewModel.addTrucks(amount, freeze) },
+        onUpdateTruck = { viewModel.updateTrucks(it) },
+        onDeleteTruck = { viewModel.deleteTrucks(it) },
+        onAddMiniTruck = { amount, freeze -> viewModel.addMiniTrucks(amount, freeze) },
+        onUpdateMiniTruck = { viewModel.updateMiniTrucks(it) },
+        onDeleteMiniTruck = { viewModel.deleteMiniTrucks(it) },
+        onAddUpload = { viewModel.addUpload(it) },
+        onUpdateUpload = { viewModel.updateUploadTruck(it) },
+        onDeleteUpload = { viewModel.deleteUploadsTruck(it) },
+        onSaveHours = { viewModel.saveHoursWorked(it) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun ScreenAddCarContent(
+    uiState: WorkingShiftUiState,
+    onSaveShift: () -> Unit,
+    onAddTruck: (Int, Int) -> Unit,
+    onUpdateTruck: (LoaderTruckModel) -> Unit,
+    onDeleteTruck: (LoaderTruckModel) -> Unit,
+    onAddMiniTruck: (Int, Int) -> Unit,
+    onUpdateMiniTruck: (MiniTruckModel) -> Unit,
+    onDeleteMiniTruck: (MiniTruckModel) -> Unit,
+    onAddUpload: (Int) -> Unit,
+    onUpdateUpload: (UploadTruckModel) -> Unit,
+    onDeleteUpload: (UploadTruckModel) -> Unit,
+    onSaveHours: (Double) -> Unit
+) {
     var openAddUploadingDialog by remember { mutableStateOf(false) }
     var openEditUploadingDialog by remember { mutableStateOf(false) }
     var openDialogLoading by remember { mutableStateOf(false) }
@@ -71,7 +106,6 @@ fun ScreenAddCar(
     var selectedMiniTruck by remember { mutableStateOf<MiniTruckModel?>(null) }
 
     val lazyColumnState = rememberLazyListState()
-    val uiState by viewModel.uiState.collectAsState()
 
     val unionTruckList = uiState.trucks.map { UnionTruckItem.LoadingTruck(it) } +
             uiState.uploads.map { UnionTruckItem.UpLoadingTruck(it) } +
@@ -134,7 +168,7 @@ fun ScreenAddCar(
                             is UnionTruckItem.LoadingTruck -> {
                                 TruckItem(
                                     variableTruck = item.truck,
-                                    deleteElement = { viewModel.deleteTrucks(item.truck) },
+                                    deleteElement = { onDeleteTruck(item.truck) },
                                     onLongClick = {
                                         selectedTruck = item.truck
                                         workType = WorkType.LOADING_20_T
@@ -145,7 +179,7 @@ fun ScreenAddCar(
                             is UnionTruckItem.UpLoadingTruck -> {
                                 UploadTruckItem(
                                     upLoaderTruckModel = item.upload,
-                                    deleteElement = { viewModel.deleteUploadsTruck(item.upload) },
+                                    deleteElement = { onDeleteUpload(item.upload) },
                                     onLongClick = {
                                         selectedUploadTrack = item.upload
                                         openEditUploadingDialog = true
@@ -155,7 +189,7 @@ fun ScreenAddCar(
                             is UnionTruckItem.LoadingMiniTruck -> {
                                 TruckItem(
                                     variableTruck = item.miniTruck,
-                                    deleteElement = { viewModel.deleteMiniTrucks(item.miniTruck) },
+                                    deleteElement = { onDeleteMiniTruck(item.miniTruck) },
                                     onLongClick = {
                                         selectedMiniTruck = item.miniTruck
                                         workType = WorkType.LOADING_12_7_5_T
@@ -167,7 +201,6 @@ fun ScreenAddCar(
                     }
                 }
 
-                // Кнопки размещаем здесь - над нижним баром
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -221,10 +254,11 @@ fun ScreenAddCar(
         FloatingActionButton(
             onClick = { openSaveConfirmDialog = true },
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 88.dp),
-            containerColor = BluePalette.Background,
-            contentColor = BluePalette.TextPrimary
+                .align(Alignment.TopStart)
+                .padding(start = 18.dp, top = 28.dp)
+                .size(48.dp),
+            containerColor = BluePalette.SaveGreen,
+            contentColor = Color.White
         ) {
             Icon(
                 imageVector = Icons.Default.Save,
@@ -240,7 +274,7 @@ fun ScreenAddCar(
                 text = { Text("Вы уверены что хотите сохранить смену в историю?") },
                 confirmButton = {
                     TextButton(onClick = {
-                        viewModel.saveShiftToHistory()
+                        onSaveShift()
                         openSaveConfirmDialog = false
                     }) { Text("Сохранить") }
                 },
@@ -258,8 +292,8 @@ fun ScreenAddCar(
                 onDismiss = { openDialogLoading = false },
                 onConfirm = { amount, freeze ->
                     when (workType) {
-                        WorkType.LOADING_20_T -> viewModel.addTrucks(amount, freeze)
-                        WorkType.LOADING_12_7_5_T -> viewModel.addMiniTrucks(amount, freeze)
+                        WorkType.LOADING_20_T -> onAddTruck(amount, freeze)
+                        WorkType.LOADING_12_7_5_T -> onAddMiniTruck(amount, freeze)
                         WorkType.UPLOADING -> {}
                     }
                     openDialogLoading = false
@@ -280,9 +314,7 @@ fun ScreenAddCar(
                                 selectedTruck = null
                             },
                             onConfirm = { amount, freeze ->
-                                viewModel.updateTrucks(
-                                    truck.copy(h_unit = amount, fz_h_unit = freeze)
-                                )
+                                onUpdateTruck(truck.copy(h_unit = amount, fz_h_unit = freeze))
                                 openEditDialog = false
                                 selectedTruck = null
                             }
@@ -300,9 +332,7 @@ fun ScreenAddCar(
                                 selectedMiniTruck = null
                             },
                             onConfirm = { amount, freeze ->
-                                viewModel.updateMiniTrucks(
-                                    miniTruck.copy(mini_eo = amount, mini_fz_eo = freeze)
-                                )
+                                onUpdateMiniTruck(miniTruck.copy(mini_eo = amount, mini_fz_eo = freeze))
                                 openEditDialog = false
                                 selectedMiniTruck = null
                             }
@@ -320,7 +350,7 @@ fun ScreenAddCar(
                     initialEo = upLoadTrack.upload,
                     onDismiss = { openEditUploadingDialog = false },
                     onConfirm = { newUploadEo ->
-                        viewModel.updateUploadTruck(upLoadTrack.copy(upload = newUploadEo))
+                        onUpdateUpload(upLoadTrack.copy(upload = newUploadEo))
                         openEditUploadingDialog = false
                     }
                 )
@@ -332,7 +362,7 @@ fun ScreenAddCar(
                 currentHours = uiState.hoursWorked,
                 onDismiss = { openHoursDialog = false },
                 onConfirm = { hours ->
-                    viewModel.saveHoursWorked(hours)
+                    onSaveHours(hours)
                     openHoursDialog = false
                 }
             )
@@ -344,10 +374,44 @@ fun ScreenAddCar(
                 initialEo = null,
                 onDismiss = { openAddUploadingDialog = false },
                 onConfirm = { newUploadEo ->
-                    viewModel.addUpload(newUploadEo)
+                    onAddUpload(newUploadEo)
                     openAddUploadingDialog = false
                 }
             )
         }
     } // Box
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun ScreenAddCarPreview() {
+    ScreenAddCarContent(
+        uiState = WorkingShiftUiState(
+            hoursWorked = 11.0,
+            performancePercent = 86.18,
+            trucks = listOf(
+                LoaderTruckModel(id = 1, h_unit = 36, fz_h_unit = 8),
+                LoaderTruckModel(id = 2, h_unit = 36, fz_h_unit = 0),
+            ),
+            uploads = listOf(
+                UploadTruckModel(id = 1, upload = 33),
+                UploadTruckModel(id = 2, upload = 33),
+                UploadTruckModel(id = 3, upload = 33),
+            ),
+            miniTrucks = listOf(
+                MiniTruckModel(id = 1, mini_eo = 10, mini_fz_eo = 0)
+            )
+        ),
+        onSaveShift = {},
+        onAddTruck = { _, _ -> },
+        onUpdateTruck = {},
+        onDeleteTruck = {},
+        onAddMiniTruck = { _, _ -> },
+        onUpdateMiniTruck = {},
+        onDeleteMiniTruck = {},
+        onAddUpload = {},
+        onUpdateUpload = {},
+        onDeleteUpload = {},
+        onSaveHours = {}
+    )
 }
