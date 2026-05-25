@@ -9,15 +9,15 @@ Android-приложение для учёта работы грузчиков �
 ## Скриншоты
 
 <p align="center">
-  <img src="screenshots/Screenshot_1.png" width="220" alt="Текущая смена — список записей и процент выработки"/>
+  <img src="screenshots/screenshot_1.png" width="220" alt="Текущая смена — список записей и процент выработки"/>
   &nbsp;&nbsp;
-  <img src="screenshots/Screenshot_2.png" width="220" alt="Диалог сохранения смены в историю"/>
+  <img src="screenshots/screenshot_2.png" width="220" alt="Диалог сохранения смены в историю"/>
   &nbsp;&nbsp;
-  <img src="screenshots/Screenshot_3.png" width="220" alt="История смен с карточками по датам"/>
+  <img src="screenshots/screenshot_3.png" width="220" alt="История смен с карточками по датам"/>
 </p>
 
 <p align="center">
-  <img src="screenshots/Screenshot_4.png" width="220" alt="Редактирование записи ЕО"/>
+  <img src="screenshots/screenshot_4.png" width="220" alt="Редактирование записи ЕО"/>
   &nbsp;&nbsp;
   <img src="screenshots/Screenshot_5.png" width="220" alt="Настройка длительности смены"/>
 </p>
